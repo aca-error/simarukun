@@ -1,20 +1,45 @@
-// src/components/Layout.tsx
 'use client';
 
 import { useState } from 'react';
-import { Menu, X, Home, Users, FileText, Settings, Bell, Search } from 'lucide-react';
+import {
+  Menu, X, Home, Users, FileText, Settings, Bell, Search, AlertCircle, LogIn, LogOut
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { user, logout } = useAuth();
 
-  const menuItems = [
-    { name: 'Beranda', icon: Home, href: '/' },
-    { name: 'Warga', icon: Users, href: '/warga' },
-    { name: 'Iuran', icon: FileText, href: '/iuran' },
-    { name: 'Aduan', icon: FileText, href: '/aduan' },
-    { name: 'Pengaturan', icon: Settings, href: '/pengaturan' },
-  ];
+  // Menu berdasarkan role
+  const getMenuItems = () => {
+    if (!user) {
+      return [
+        { name: 'Beranda', icon: Home, href: '/' },
+        { name: 'Login', icon: LogIn, href: '/login' },
+      ];
+    }
+
+    if (user.role === 'admin') {
+      return [
+        { name: 'Beranda', icon: Home, href: '/' },
+        { name: 'Warga', icon: Users, href: '/warga' },
+        { name: 'Iuran', icon: FileText, href: '/iuran' },
+        { name: 'Aduan', icon: AlertCircle, href: '/aduan' },
+        { name: 'Pengaturan', icon: Settings, href: '/pengaturan' },
+        { name: 'Logout', icon: LogOut, href: '/', action: logout },
+      ];
+    } else {
+      return [
+        { name: 'Beranda', icon: Home, href: '/' },
+        { name: 'Pengaturan', icon: Settings, href: '/pengaturan' },
+        { name: 'Logout', icon: LogOut, href: '/', action: logout },
+      ];
+    }
+  };
+
+  const menuItems = getMenuItems();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -23,15 +48,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-bold text-primary-600">SimaRukun</h1>
+              <Link href="/" className="text-xl font-bold text-primary-600">SimaRukun</Link>
             </div>
             <div className="flex items-center space-x-4">
-              <button className="p-2 rounded-full hover:bg-gray-100">
-                <Search className="h-5 w-5 text-gray-500" />
-              </button>
-              <button className="p-2 rounded-full hover:bg-gray-100">
-                <Bell className="h-5 w-5 text-gray-500" />
-              </button>
+              {user && (
+                <>
+                  <button className="p-2 rounded-full hover:bg-gray-100">
+                    <Search className="h-5 w-5 text-gray-500" />
+                  </button>
+                  <button className="p-2 rounded-full hover:bg-gray-100">
+                    <Bell className="h-5 w-5 text-gray-500" />
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -57,14 +86,29 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           >
             <div className="p-4">
               {menuItems.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className="flex items-center p-3 rounded-lg hover:bg-primary-50 transition-colors mb-2"
-                >
-                  <item.icon className="h-5 w-5 text-primary-600 mr-3" />
-                  <span className="font-medium text-gray-700">{item.name}</span>
-                </a>
+                <div key={item.name}>
+                  {item.action ? (
+                    <button
+                      onClick={() => {
+                        item.action();
+                        setIsSidebarOpen(false);
+                      }}
+                      className="w-full flex items-center p-3 rounded-lg hover:bg-red-50 transition-colors mb-2 text-left"
+                    >
+                      <item.icon className="h-5 w-5 text-red-600 mr-3" />
+                      <span className="font-medium text-red-700">{item.name}</span>
+                    </button>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      className="flex items-center p-3 rounded-lg hover:bg-primary-50 transition-colors mb-2"
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      <item.icon className="h-5 w-5 text-primary-600 mr-3" />
+                      <span className="font-medium text-gray-700">{item.name}</span>
+                    </Link>
+                  )}
+                </div>
               ))}
             </div>
           </motion.div>
