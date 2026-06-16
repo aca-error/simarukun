@@ -23,26 +23,41 @@ Aplikasi ini dibangun dengan **Next.js (React)**, **Tailwind CSS**, dan **TypeSc
 
 ---
 
+## 👥 Profil Pengguna (User Personas)
+
+Aplikasi SimaRukun mendukung **4 role** yang berbeda, sesuai dengan PRD:
+
+| **Role** | **Deskripsi** | **Tugas Utama** |
+|----------|--------------|------------------|
+| **Super Admin** | Pengembang/Pemilik Sistem | Mengelola sistem secara keseluruhan, backup data, pemeliharaan webhook, dan server uptime. |
+| **Supervisor** | Ketua RT/RW | Memantau rekapitulasi data, menerima laporan eksekutif via bot, dan memberikan persetujuan krusial. |
+| **Admin/Staff** | Sekretaris/Bendahara | Mengelola data warga, memantau pembayaran iuran otomatis/manual, membuat pengumuman, dan menindaklanjuti laporan warga. |
+| **Warga** | Kepala Keluarga/Anggota Keluarga | Membayar iuran, melihat laporan keuangan, menerima pengumuman, dan membuat laporan (aduan/keamanan). |
+
+---
+
 ## 📚 Daftar Isi
 
 1. [Deskripsi Proyek](#-deskripsi-proyek)
 2. [Tujuan dan Goal](#-tujuan-dan-goal)
-3. [Daftar Isi](#-daftar-isi)
-4. [Panduan Instalasi](INSTALL.md)
-5. [Panduan Pengguna](USER.md)
-6. [Struktur Proyek](#-struktur-proyek)
-7. [Tech Stack](#-tech-stack)
-8. [Fitur Utama](#-fitur-utama)
-9. [Keamanan dan Privasi](#-keamanan-dan-privasi)
-10. [Kontribusi](#-kontribusi)
-11. [Lisensi](#-lisensi)
+3. [Profil Pengguna](#-profil-pengguna-user-personas)
+4. [Daftar Isi](#-daftar-isi)
+5. [Panduan Instalasi](INSTALL.md)
+6. [Panduan Pengguna](USER.md)
+7. [Struktur Proyek](#-struktur-proyek)
+8. [Tech Stack](#-tech-stack)
+9. [Fitur Utama](#-fitur-utama)
+10. [Keamanan dan Privasi](#-keamanan-dan-privasi)
+11. [Demo Credentials](#-demo-credentials)
+12. [Kontribusi](#-kontribusi)
+13. [Lisensi](#-lisensi)
 
 ---
 
 ## 📖 Panduan
 
 - **[Panduan Instalasi](INSTALL.md)** – Langkah-langkah untuk menginstal dan menjalankan proyek secara lokal.
-- **[Panduan Pengguna](USER.md)** – Panduan penggunaan aplikasi untuk Admin dan Warga.
+- **[Panduan Pengguna](USER.md)** – Panduan penggunaan aplikasi untuk semua role.
 
 ---
 
@@ -55,16 +70,33 @@ simarukun/
 │       ├── public/                   # Asset statis
 │       ├── src/
 │       │   ├── components/           # Komponen reusable
+│       │   │   └── Layout.tsx         # Layout dengan navigasi berbasis role
 │       │   ├── contexts/              # Context API (Auth)
+│       │   │   └── AuthContext.tsx    # Context untuk autentikasi
 │       │   ├── lib/                   # Helper functions
-│       │   ├── middleware.ts          # Proteksi route
+│       │   │   └── auth.ts            # Helper autentikasi (login, logout, hasAccess)
 │       │   ├── types/                 # Tipe data
+│       │   │   └── user.ts            # Tipe User dan Role (4 roles)
+│       │   ├── middleware.ts          # Proteksi route (server-side)
 │       │   └── pages/                 # Halaman aplikasi
+│       │       ├── index.tsx         # Dashboard (berbeda per role)
 │       │       ├── login.tsx          # Halaman Login
-│       │       ├── warga/             # Halaman Warga (admin-only)
-│       │       ├── iuran/             # Halaman Iuran (admin-only)
-│       │       ├── aduan/             # Halaman Aduan (admin-only)
-│       │       └── pengaturan.tsx     # Halaman Pengaturan
+│       │       ├── warga/
+│       │       │   └── index.tsx       # Daftar Warga (superadmin, supervisor, admin)
+│       │       ├── iuran/
+│       │       │   └── index.tsx       # Daftar Iuran (superadmin, supervisor, admin)
+│       │       ├── aduan/
+│       │       │   ├── index.tsx       # Daftar Aduan (superadmin, supervisor, admin)
+│       │       │   └── buat.tsx        # Buat Aduan (superadmin, supervisor, admin)
+│       │       ├── laporan/
+│       │       │   └── index.tsx       # Laporan (superadmin, supervisor)
+│       │       ├── backup/
+│       │       │   └── index.tsx       # Backup (superadmin only)
+│       │       ├── webhook/
+│       │       │   └── index.tsx       # Webhook (superadmin only)
+│       │       ├── server/
+│       │       │   └── index.tsx       # Server (superadmin only)
+│       │       └── pengaturan.tsx      # Pengaturan (semua role)
 │       ├── package.json
 │       ├── next.config.js
 │       ├── tsconfig.json
@@ -92,50 +124,95 @@ simarukun/
 
 ## ✨ Fitur Utama
 
-### **🔐 Autentikasi & Otorisasi**
-- **Role-Based Access Control (RBAC)**: Admin dan Warga memiliki akses yang berbeda.
-- **Proteksi Route**: Tidak ada akses langsung via URL tanpa autentikasi.
-- **Login/Logout**: Sistem autentikasi dengan demo credentials.
+### **🔐 Autentikasi & Otorisasi (RBAC)**
+- **4 Role**: Super Admin, Supervisor, Admin, Warga.
+- **Proteksi Route**: Server-side (middleware) + Client-side (hasAccess).
+- **Tidak Ada Akses Shortcut**: Semua percobaan akses ilegal akan diredirect.
 
-### **📊 Dashboard**
-- **Admin**: Statistik Jumlah Warga, Iuran Terkumpul, Aduan Baru, Laporan.
-- **Warga**: Status Iuran dan Aduan Saya.
+### **📊 Dashboard (Berbeda per Role)**
+- **Super Admin**: Statistik lengkap + Backup/Webhook/Server status.
+- **Supervisor**: Statistik + Laporan Eksekutif + Persetujuan.
+- **Admin**: Statistik Warga, Iuran, Aduan, Laporan.
+- **Warga**: Status Iuran, Aduan Saya, Pengumuman.
 
-### **👥 Manajemen Warga** (Admin-only)
+### **👥 Manajemen Warga** (Super Admin, Supervisor, Admin)
 - Daftar warga dengan filter pencarian.
-- Status warga dan iuran.
-- Tombol aksi (Edit, Hapus).
+- Status warga (Aktif) dan status iuran (Lunas/Belum).
+- Tombol aksi (Edit, Hapus) - hanya untuk Admin ke atas.
 
-### **💰 Manajemen Iuran** (Admin-only)
+### **💰 Manajemen Iuran** (Super Admin, Supervisor, Admin)
 - Daftar iuran dengan status (Lunas/Belum).
 - Pencarian berdasarkan bulan/status.
+- Lihat detail iuran.
 
-### **📝 Manajemen Aduan** (Admin-only)
+### **📝 Manajemen Aduan** (Super Admin, Supervisor, Admin)
 - Daftar aduan dengan status (Belum Ditangani/Diproses/Selesai).
 - Form untuk membuat aduan baru.
+- Filter pencarian.
 
-### **⚙️ Pengaturan** (Admin & Warga)
+### **📄 Laporan** (Super Admin, Supervisor)
+- Laporan Keuangan, Aduan, Warga, Eksekutif.
+- Export laporan.
+- Super Admin: Lihat status Backup dan Webhook.
+
+### **💾 Backup** (Super Admin only)
+- Buat backup baru.
+- Restore backup.
+- Download backup.
+- Statistik backup.
+
+### **🔌 Webhook** (Super Admin only)
+- Monitor status webhook.
+- Test webhook.
+- Toggle webhook.
+- Statistik webhook.
+
+### **🖥️ Server** (Super Admin only)
+- Monitor uptime, CPU, Memory, Bandwidth.
+- Kontrol server (Restart, Optimize).
+- Aktivitas terbaru.
+
+### **⚙️ Pengaturan** (Semua Role)
 - Edit profil (nama, email).
 - Toggle notifikasi.
-- Lihat role user.
+- Lihat informasi akun (role, ID).
+- **Super Admin**: Panel khusus (Backup, Webhook, Server).
+- **Supervisor**: Panel khusus (Laporan Eksekutif, Persetujuan).
 
 ---
 
 ## 🔒 Keamanan dan Privasi
 
 ### **1. Role-Based Access Control (RBAC)**
-| **Role**  | **Halaman yang Bisa Diakses**                          |
-|-----------|-------------------------------------------------------|
-| **Admin** | `/`, `/warga`, `/iuran`, `/aduan`, `/pengaturan`        |
-| **Warga** | `/`, `/pengaturan`                                    |
+
+| **Role** | **Halaman yang Bisa Diakses** |
+|----------|--------------------------------------|
+| **Super Admin** | Semua halaman (`/`, `/warga`, `/iuran`, `/aduan`, `/pengaturan`, `/laporan`, `/backup`, `/webhook`, `/server`) |
+| **Supervisor** | `/`, `/warga`, `/iuran`, `/aduan`, `/pengaturan`, `/laporan` |
+| **Admin** | `/`, `/warga`, `/iuran`, `/aduan`, `/pengaturan` |
+| **Warga** | `/`, `/pengaturan` |
 
 ### **2. Proteksi Route**
 - **Server-side**: `middleware.ts` memastikan tidak ada akses langsung via URL tanpa autentikasi.
 - **Client-side**: Setiap halaman memeriksa `hasAccess()` sebelum render.
 
 ### **3. Tidak Ada Akses Shortcut**
-- Warga **tidak bisa** mengakses `/warga`, `/iuran`, `/aduan`, atau `/warga/[id]`.
+- Contoh: Warga **tidak bisa** mengakses `/warga`, `/iuran`, `/aduan`.
+- Contoh: Admin **tidak bisa** mengakses `/backup`, `/webhook`, `/server`.
 - Semua percobaan akses ilegal akan **diredirect ke `/login` atau `/`**.
+
+---
+
+## 🔑 Demo Credentials
+
+Anda bisa mencoba login dengan akun demo berikut:
+
+| **Role** | **Email** | **Password** | **Akses** |
+|----------|-----------|--------------|-----------|
+| Super Admin | `superadmin@simarukun.com` | `superadmin123` | Semua halaman |
+| Supervisor | `ketua@rt01.com` | `supervisor123` | Semua halaman kecuali Backup/Webhook/Server |
+| Admin | `sekretaris@rt01.com` | `admin123` | Warga, Iuran, Aduan, Pengaturan |
+| Warga | `joko@example.com` | `warga123` | Dashboard, Pengaturan |
 
 ---
 
