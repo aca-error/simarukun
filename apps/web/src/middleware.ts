@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { RoleAccess } from '@/types/user';
 
 // Daftar path yang memerlukan autentikasi
 const protectedPaths = [
@@ -7,13 +8,10 @@ const protectedPaths = [
   '/iuran',
   '/aduan',
   '/pengaturan',
-];
-
-// Daftar path admin-only
-const adminOnlyPaths = [
-  '/warga',
-  '/iuran',
-  '/aduan',
+  '/laporan',
+  '/backup',
+  '/webhook',
+  '/server'
 ];
 
 export function middleware(request: NextRequest) {
@@ -28,9 +26,7 @@ export function middleware(request: NextRequest) {
   const isProtectedPath = protectedPaths.some((p) => path.startsWith(p));
   
   if (isProtectedPath) {
-    // Check if user is logged in (via cookie or localStorage simulation)
-    // Note: In Next.js middleware, we can't directly access localStorage,
-    // so we use cookies for server-side auth check
+    // Check if user is logged in (via cookie)
     const userCookie = request.cookies.get('user')?.value;
     
     if (!userCookie) {
@@ -38,19 +34,18 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    // Check if the path is admin-only
-    const isAdminOnlyPath = adminOnlyPaths.some((p) => path.startsWith(p));
-    if (isAdminOnlyPath) {
-      try {
-        const user = JSON.parse(userCookie);
-        if (user.role !== 'admin') {
-          // Not admin, redirect to home
-          return NextResponse.redirect(new URL('/', request.url));
-        }
-      } catch (e) {
-        // Invalid user data, redirect to login
-        return NextResponse.redirect(new URL('/login', request.url));
+    // Check if user has access to this path based on their role
+    try {
+      const user = JSON.parse(userCookie);
+      const allowedPaths = RoleAccess[user.role as keyof typeof RoleAccess] || [];
+      
+      if (!allowedPaths.some((p) => path.startsWith(p))) {
+        // User doesn't have access to this path, redirect to home
+        return NextResponse.redirect(new URL('/', request.url));
       }
+    } catch (e) {
+      // Invalid user data, redirect to login
+      return NextResponse.redirect(new URL('/login', request.url));
     }
   }
 
