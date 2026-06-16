@@ -1,14 +1,15 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { User, UserRole } from '@/types/user';
-import { getCurrentUser, logoutUser, loginUser, hasAccess } from '@/lib/auth';
+import { User, UserRole, RoleDescriptions } from '@/types/user';
+import { getCurrentUser, logoutUser, loginUser, hasAccess, getRoleDescription } from '@/lib/auth';
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => boolean;
   logout: () => void;
   hasAccess: (path: string) => boolean;
+  getRoleDescription: (role: string) => string;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -16,6 +17,7 @@ const AuthContext = createContext<AuthContextType>({
   login: () => false,
   logout: () => {},
   hasAccess: () => false,
+  getRoleDescription: () => '',
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -44,8 +46,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return hasAccess(user.role, path);
   };
 
+  const getRoleDescription = (role: string): string => {
+    return RoleDescriptions[role as UserRole] || 'Role tidak diketahui';
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, hasAccess: checkAccess }}>
+    <AuthContext.Provider value={{ user, login, logout, hasAccess: checkAccess, getRoleDescription }}>
       {children}
     </AuthContext.Provider>
   );
