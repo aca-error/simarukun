@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Search, Plus, Edit, Trash2 } from 'lucide-react';
 import Layout from '@/components/Layout';
@@ -38,10 +38,12 @@ export default function Warga() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-900">Daftar Warga</h1>
-          <button className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center">
-            <Plus className="h-5 w-5 mr-2" />
-            Tambah Warga
-          </button>
+          {(user?.role === 'superadmin' || user?.role === 'supervisor' || user?.role === 'admin') && (
+            <button className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center">
+              <Plus className="h-5 w-5 mr-2" />
+              Tambah Warga
+            </button>
+          )}
         </div>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -84,12 +86,16 @@ export default function Warga() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button className="text-primary-600 hover:text-primary-800 mr-2">
-                      <Edit className="h-5 w-5" />
-                    </button>
-                    <button className="text-red-500 hover:text-red-700">
-                      <Trash2 className="h-5 w-5" />
-                    </button>
+                    {(user?.role === 'superadmin' || user?.role === 'supervisor' || user?.role === 'admin') && (
+                      <>
+                        <button className="text-primary-600 hover:text-primary-800 mr-2">
+                          <Edit className="h-5 w-5" />
+                        </button>
+                        <button className="text-red-500 hover:text-red-700">
+                          <Trash2 className="h-5 w-5" />
+                        </button>
+                      </>
+                    )}
                   </td>
                 </tr>
               ))}
