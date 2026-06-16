@@ -38,10 +38,12 @@ export default function Iuran() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-900">Daftar Iuran</h1>
-          <button className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center">
-            <Plus className="h-5 w-5 mr-2" />
-            Tambah Iuran
-          </button>
+          {(user?.role === 'superadmin' || user?.role === 'supervisor' || user?.role === 'admin') && (
+            <button className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center">
+              <Plus className="h-5 w-5 mr-2" />
+              Tambah Iuran
+            </button>
+          )}
         </div>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -71,9 +73,11 @@ export default function Iuran() {
                 <DollarSign className="h-5 w-5 text-primary-600" />
                 <p className="ml-2 text-lg font-bold text-gray-900">{iuran.jumlah}</p>
               </div>
-              <button className="mt-4 w-full bg-primary-50 text-primary-600 py-2 rounded-lg hover:bg-primary-100 transition-colors">
-                Lihat Detail
-              </button>
+              {(user?.role === 'superadmin' || user?.role === 'supervisor' || user?.role === 'admin') && (
+                <button className="mt-4 w-full bg-primary-50 text-primary-600 py-2 rounded-lg hover:bg-primary-100 transition-colors">
+                  Lihat Detail
+                </button>
+              )}
             </div>
           ))}
         </div>
