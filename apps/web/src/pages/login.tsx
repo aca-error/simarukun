@@ -78,14 +78,26 @@ export default function Login() {
             Masuk
           </button>
         </form>
-        <div className="mt-6 text-center text-sm text-gray-500">
+        <div className="mt-6 text-center text-sm text-gray-500 space-y-2">
           <p>Demo Login:</p>
-          <p className="mt-1">
-            <span className="font-medium">Admin:</span> admin@rt01.com / admin123
-          </p>
-          <p>
-            <span className="font-medium">Warga:</span> joko@example.com / warga123
-          </p>
+          <div className="bg-gray-50 p-3 rounded-lg space-y-2">
+            <div>
+              <span className="font-medium text-purple-600">Super Admin:</span>
+              <p className="text-xs">superadmin@simarukun.com / superadmin123</p>
+            </div>
+            <div>
+              <span className="font-medium text-blue-600">Supervisor:</span>
+              <p className="text-xs">ketua@rt01.com / supervisor123</p>
+            </div>
+            <div>
+              <span className="font-medium text-green-600">Admin:</span>
+              <p className="text-xs">sekretaris@rt01.com / admin123</p>
+            </div>
+            <div>
+              <span className="font-medium text-orange-600">Warga:</span>
+              <p className="text-xs">joko@example.com / warga123</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
