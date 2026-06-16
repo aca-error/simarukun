@@ -33,7 +33,14 @@ export default function BuatAduan() {
   return (
     <Layout>
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold text-gray-900">Buat Aduan Baru</h1>
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-gray-900">Buat Aduan Baru</h1>
+          {(user?.role === 'superadmin' || user?.role === 'supervisor' || user?.role === 'admin') && (
+            <span className="text-sm text-gray-500">
+              Hanya Admin, Supervisor, dan Super Admin yang dapat membuat aduan
+            </span>
+          )}
+        </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Judul Aduan</label>
@@ -71,13 +78,15 @@ export default function BuatAduan() {
             </label>
             {foto && <p className="mt-2 text-sm text-gray-600">File: {foto.name}</p>}
           </div>
-          <button
-            type="submit"
-            className="w-full bg-primary-600 text-white py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors flex items-center justify-center"
-          >
-            <Send className="h-5 w-5 mr-2" />
-            Kirim Aduan
-          </button>
+          {(user?.role === 'superadmin' || user?.role === 'supervisor' || user?.role === 'admin') && (
+            <button
+              type="submit"
+              className="w-full bg-primary-600 text-white py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors flex items-center justify-center"
+            >
+              <Send className="h-5 w-5 mr-2" />
+              Kirim Aduan
+            </button>
+          )}
         </form>
       </div>
     </Layout>
