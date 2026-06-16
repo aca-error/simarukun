@@ -47,10 +47,12 @@ export default function Aduan() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-900">Daftar Aduan</h1>
-          <button className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center">
-            <Plus className="h-5 w-5 mr-2" />
-            Buat Aduan
-          </button>
+          {(user?.role === 'superadmin' || user?.role === 'supervisor' || user?.role === 'admin') && (
+            <button className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center">
+              <Plus className="h-5 w-5 mr-2" />
+              Buat Aduan
+            </button>
+          )}
         </div>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -81,9 +83,11 @@ export default function Aduan() {
                 </span>
               </div>
               <p className="mt-3 text-gray-600">{aduan.deskripsi}</p>
-              <button className="mt-4 text-primary-600 hover:text-primary-800">
-                Lihat Detail →
-              </button>
+              {(user?.role === 'superadmin' || user?.role === 'supervisor' || user?.role === 'admin') && (
+                <button className="mt-4 text-primary-600 hover:text-primary-800">
+                  Lihat Detail →
+                </button>
+              )}
             </div>
           ))}
         </div>
