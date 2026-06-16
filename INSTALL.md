@@ -76,20 +76,43 @@ Aplikasi akan berjalan di:
 - Kunjungi **[http://localhost:3000](http://localhost:3000)**.
 
 ### **2. Login dengan Akun Demo**
-Anda bisa mencoba login dengan akun demo berikut:
+Anda bisa mencoba login dengan akun demo untuk **4 role yang berbeda**:
 
-| **Role**  | **Email**            | **Password** | **Akses**                          |
-|-----------|---------------------|--------------|------------------------------------|
-| Admin     | `admin@rt01.com`    | `admin123`   | Semua halaman (Warga, Iuran, Aduan). |
-| Warga     | `joko@example.com`  | `warga123`   | Dashboard & Pengaturan.             |
+| **Role** | **Email** | **Password** | **Akses** |
+|----------|-----------|--------------|-----------|
+| **Super Admin** | `superadmin@simarukun.com` | `superadmin123` | Semua halaman (termasuk Backup, Webhook, Server) |
+| **Supervisor** | `ketua@rt01.com` | `supervisor123` | Semua halaman kecuali Backup, Webhook, Server |
+| **Admin** | `sekretaris@rt01.com` | `admin123` | Warga, Iuran, Aduan, Laporan, Pengaturan |
+| **Warga** | `joko@example.com` | `warga123` | Dashboard, Pengaturan |
 
 ### **3. Uji Coba Fitur**
-- **Admin**:
-  - Lihat daftar warga, iuran, dan aduan.
-  - Tambah/Edit/Hapus data (fitur demo).
-- **Warga**:
-  - Lihat status iuran dan aduan pribadi.
-  - Coba akses halaman admin (akan diredirect).
+
+#### **Untuk Super Admin:**
+- Lihat dashboard lengkap dengan statistik Backup, Webhook, Server.
+- Akses semua halaman (Warga, Iuran, Aduan, Laporan, Backup, Webhook, Server).
+- Kelola backup, webhook, dan monitor server.
+
+#### **Untuk Supervisor:**
+- Lihat dashboard dengan statistik dan Laporan Eksekutif.
+- Akses Warga, Iuran, Aduan, Laporan, Pengaturan.
+- Beri persetujuan untuk aduan/laporan.
+- **Tidak bisa** mengakses Backup, Webhook, Server.
+
+#### **Untuk Admin:**
+- Lihat daftar warga, iuran, dan aduan.
+- Tambah/Edit/Hapus data (fitur demo).
+- Akses Warga, Iuran, Aduan, Laporan, Pengaturan.
+- **Tidak bisa** mengakses Backup, Webhook, Server, Laporan Eksekutif.
+
+#### **Untuk Warga:**
+- Lihat status iuran dan aduan pribadi di Dashboard.
+- Akses Pengaturan untuk edit profil.
+- **Tidak bisa** mengakses Warga, Iuran, Aduan, Laporan, Backup, Webhook, Server.
+
+#### **Uji Akses Terlarang:**
+- Coba akses `/warga` sebagai Warga → **Akan diredirect ke `/`**.
+- Coba akses `/backup` sebagai Admin → **Akan diredirect ke `/`**.
+- Coba akses `/server` sebagai Supervisor → **Akan diredirect ke `/`**.
 
 ---
 
@@ -141,15 +164,32 @@ simarukun/
 │       ├── public/                   # Asset statis
 │       ├── src/
 │       │   ├── components/           # Komponen reusable
+│       │   │   └── Layout.tsx         # Layout dengan navigasi berbasis role
 │       │   ├── contexts/              # Context API (Auth)
+│       │   │   └── AuthContext.tsx    # Context untuk autentikasi
 │       │   ├── lib/                   # Helper functions
-│       │   ├── middleware.ts          # Proteksi route
+│       │   │   └── auth.ts            # Helper autentikasi
 │       │   ├── types/                 # Tipe data
+│       │   │   └── user.ts            # Tipe User dan 4 Role
+│       │   ├── middleware.ts          # Proteksi route (server-side)
 │       │   └── pages/                 # Halaman aplikasi
+│       │       ├── index.tsx         # Dashboard
 │       │       ├── login.tsx          # Halaman Login
 │       │       ├── warga/             # Halaman Warga
+│       │       │   └── index.tsx
 │       │       ├── iuran/             # Halaman Iuran
+│       │       │   └── index.tsx
 │       │       ├── aduan/             # Halaman Aduan
+│       │       │   ├── index.tsx
+│       │       │   └── buat.tsx
+│       │       ├── laporan/           # Halaman Laporan
+│       │       │   └── index.tsx
+│       │       ├── backup/            # Halaman Backup
+│       │       │   └── index.tsx
+│       │       ├── webhook/           # Halaman Webhook
+│       │       │   └── index.tsx
+│       │       ├── server/            # Halaman Server
+│       │       │   └── index.tsx
 │       │       └── pengaturan.tsx     # Halaman Pengaturan
 │       ├── package.json
 │       ├── next.config.js
@@ -181,7 +221,11 @@ simarukun/
    - Menggunakan `localStorage` untuk menyimpan session.
    - Nanti akan diganti dengan **JWT + API** (backend).
 
-3. **Untuk Production**:
+3. **Role-Based Access Control (RBAC)**.
+   - Setiap role memiliki akses yang berbeda.
+   - Proteksi route di server-side (middleware) dan client-side.
+
+4. **Untuk Production**:
    - Jalankan `npm run build` untuk membuat build production.
    - Gunakan `npm run start` untuk menjalankan server production.
 
