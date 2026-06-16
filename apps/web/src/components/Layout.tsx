@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import {
-  Menu, X, Home, Users, FileText, Settings, Bell, Search, AlertCircle, LogIn, LogOut
+  Menu, X, Home, Users, FileText, Settings, Bell, Search, 
+  AlertCircle, LogIn, LogOut, BarChart3, Database, Webhook, Server
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -12,7 +13,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { user, logout } = useAuth();
 
-  // Menu berdasarkan role
+  // Menu berdasarkan role (4 roles: superadmin, supervisor, admin, warga)
   const getMenuItems = () => {
     if (!user) {
       return [
@@ -21,21 +22,56 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       ];
     }
 
-    if (user.role === 'admin') {
-      return [
-        { name: 'Beranda', icon: Home, href: '/' },
-        { name: 'Warga', icon: Users, href: '/warga' },
-        { name: 'Iuran', icon: FileText, href: '/iuran' },
-        { name: 'Aduan', icon: AlertCircle, href: '/aduan' },
-        { name: 'Pengaturan', icon: Settings, href: '/pengaturan' },
-        { name: 'Logout', icon: LogOut, href: '/', action: logout },
-      ];
-    } else {
-      return [
-        { name: 'Beranda', icon: Home, href: '/' },
-        { name: 'Pengaturan', icon: Settings, href: '/pengaturan' },
-        { name: 'Logout', icon: LogOut, href: '/', action: logout },
-      ];
+    // Import icons for all menu items
+    const icons = {
+      Home, Users, FileText, Settings, AlertCircle, LogOut, 
+      BarChart3, Database, Webhook, Server
+    };
+
+    switch (user.role) {
+      case 'superadmin':
+        return [
+          { name: 'Beranda', icon: Home, href: '/' },
+          { name: 'Warga', icon: Users, href: '/warga' },
+          { name: 'Iuran', icon: FileText, href: '/iuran' },
+          { name: 'Aduan', icon: AlertCircle, href: '/aduan' },
+          { name: 'Laporan', icon: BarChart3, href: '/laporan' },
+          { name: 'Backup', icon: Database, href: '/backup' },
+          { name: 'Webhook', icon: Webhook, href: '/webhook' },
+          { name: 'Server', icon: Server, href: '/server' },
+          { name: 'Pengaturan', icon: Settings, href: '/pengaturan' },
+          { name: 'Logout', icon: LogOut, href: '/', action: logout },
+        ];
+      case 'supervisor':
+        return [
+          { name: 'Beranda', icon: Home, href: '/' },
+          { name: 'Warga', icon: Users, href: '/warga' },
+          { name: 'Iuran', icon: FileText, href: '/iuran' },
+          { name: 'Aduan', icon: AlertCircle, href: '/aduan' },
+          { name: 'Laporan', icon: BarChart3, href: '/laporan' },
+          { name: 'Pengaturan', icon: Settings, href: '/pengaturan' },
+          { name: 'Logout', icon: LogOut, href: '/', action: logout },
+        ];
+      case 'admin':
+        return [
+          { name: 'Beranda', icon: Home, href: '/' },
+          { name: 'Warga', icon: Users, href: '/warga' },
+          { name: 'Iuran', icon: FileText, href: '/iuran' },
+          { name: 'Aduan', icon: AlertCircle, href: '/aduan' },
+          { name: 'Pengaturan', icon: Settings, href: '/pengaturan' },
+          { name: 'Logout', icon: LogOut, href: '/', action: logout },
+        ];
+      case 'warga':
+        return [
+          { name: 'Beranda', icon: Home, href: '/' },
+          { name: 'Pengaturan', icon: Settings, href: '/pengaturan' },
+          { name: 'Logout', icon: LogOut, href: '/', action: logout },
+        ];
+      default:
+        return [
+          { name: 'Beranda', icon: Home, href: '/' },
+          { name: 'Logout', icon: LogOut, href: '/', action: logout },
+        ];
     }
   };
 
