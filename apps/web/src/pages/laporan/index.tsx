@@ -35,12 +35,23 @@ export default function Laporan() {
     laporan.jenis.toLowerCase().includes(search.toLowerCase())
   );
 
+  // REVISED: laporan accessible by superadmin, supervisor, admin
+  const getAccessNote = () => {
+    if (user.role === 'superadmin') {
+      return 'Halaman ini dapat diakses oleh Super Admin, Supervisor, dan Admin.';
+    } else if (user.role === 'supervisor') {
+      return 'Halaman ini dapat diakses oleh Super Admin, Supervisor, dan Admin.';
+    } else {
+      return 'Halaman ini dapat diakses oleh Super Admin, Supervisor, dan Admin.';
+    }
+  };
+
   return (
     <Layout>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-900">Laporan</h1>
-          {(user.role === 'superadmin' || user.role === 'supervisor') && (
+          {(user.role === 'superadmin' || user.role === 'supervisor' || user.role === 'admin') && (
             <button className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center">
               <Download className="h-5 w-5 mr-2" />
               Export Laporan
@@ -50,10 +61,10 @@ export default function Laporan() {
         
         <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
           <p className="text-sm text-blue-800">
-            <strong>Catatan:</strong> Halaman ini hanya dapat diakses oleh <strong>Super Admin</strong> dan <strong>Supervisor</strong>.
+            <strong>Catatan:</strong> {getAccessNote()}
           </p>
           <p className="text-xs text-blue-600 mt-1">
-            {user.role === 'superadmin' ? getRoleDescription('superadmin') : getRoleDescription('supervisor')}
+            {getRoleDescription(user.role)}
           </p>
         </div>
         
@@ -108,6 +119,25 @@ export default function Laporan() {
               <div className="bg-white p-4 rounded-lg border">
                 <h3 className="font-medium text-gray-900">Webhook Status</h3>
                 <p className="text-sm text-gray-500">Status webhook: Active</p>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Supervisor Specific */}
+        {user.role === 'supervisor' && (
+          <div className="mt-6 bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <h2 className="text-lg font-semibold text-blue-900 mb-3">
+              Laporan Eksekutif
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-white p-4 rounded-lg border">
+                <h3 className="font-medium text-gray-900">Persetujuan Tertunda</h3>
+                <p className="text-sm text-gray-500">Jumlah: 5</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg border">
+                <h3 className="font-medium text-gray-900">Rekapitulasi Data</h3>
+                <p className="text-sm text-gray-500">Status: Terbaru</p>
               </div>
             </div>
           </div>
