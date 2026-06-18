@@ -14,6 +14,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth();
 
   // Menu berdasarkan role (4 roles: superadmin, supervisor, admin, warga)
+  // REVISED: laporan for superadmin, supervisor, admin
+  // REVISED: backup for superadmin, supervisor
   const getMenuItems = () => {
     if (!user) {
       return [
@@ -21,12 +23,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         { name: 'Login', icon: LogIn, href: '/login' },
       ];
     }
-
-    // Import icons for all menu items
-    const icons = {
-      Home, Users, FileText, Settings, AlertCircle, LogOut, 
-      BarChart3, Database, Webhook, Server
-    };
 
     switch (user.role) {
       case 'superadmin':
@@ -49,6 +45,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           { name: 'Iuran', icon: FileText, href: '/iuran' },
           { name: 'Aduan', icon: AlertCircle, href: '/aduan' },
           { name: 'Laporan', icon: BarChart3, href: '/laporan' },
+          { name: 'Backup', icon: Database, href: '/backup' },
           { name: 'Pengaturan', icon: Settings, href: '/pengaturan' },
           { name: 'Logout', icon: LogOut, href: '/', action: logout },
         ];
@@ -58,6 +55,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           { name: 'Warga', icon: Users, href: '/warga' },
           { name: 'Iuran', icon: FileText, href: '/iuran' },
           { name: 'Aduan', icon: AlertCircle, href: '/aduan' },
+          { name: 'Laporan', icon: BarChart3, href: '/laporan' },
           { name: 'Pengaturan', icon: Settings, href: '/pengaturan' },
           { name: 'Logout', icon: LogOut, href: '/', action: logout },
         ];
