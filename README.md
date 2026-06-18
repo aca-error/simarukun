@@ -82,16 +82,16 @@ simarukun/
 │       │       ├── index.tsx         # Dashboard (berbeda per role)
 │       │       ├── login.tsx          # Halaman Login
 │       │       ├── warga/
-│       │       │   └── index.tsx       # Daftar Warga (superadmin, supervisor, admin)
+│       │       │   └── index.tsx       # Daftar Warga
 │       │       ├── iuran/
-│       │       │   └── index.tsx       # Daftar Iuran (superadmin, supervisor, admin)
+│       │       │   └── index.tsx       # Daftar Iuran
 │       │       ├── aduan/
-│       │       │   ├── index.tsx       # Daftar Aduan (superadmin, supervisor, admin)
-│       │       │   └── buat.tsx        # Buat Aduan (superadmin, supervisor, admin)
+│       │       │   ├── index.tsx       # Daftar Aduan
+│       │       │   └── buat.tsx        # Buat Aduan
 │       │       ├── laporan/
-│       │       │   └── index.tsx       # Laporan (superadmin, supervisor)
+│       │       │   └── index.tsx       # Laporan (superadmin, supervisor, admin)
 │       │       ├── backup/
-│       │       │   └── index.tsx       # Backup (superadmin only)
+│       │       │   └── index.tsx       # Backup (superadmin, supervisor)
 │       │       ├── webhook/
 │       │       │   └── index.tsx       # Webhook (superadmin only)
 │       │       ├── server/
@@ -131,14 +131,14 @@ simarukun/
 
 ### **📊 Dashboard (Berbeda per Role)**
 - **Super Admin**: Statistik lengkap + Backup/Webhook/Server status.
-- **Supervisor**: Statistik + Laporan Eksekutif + Persetujuan.
+- **Supervisor**: Statistik + Laporan Eksekutif + Persetujuan Tertunda.
 - **Admin**: Statistik Warga, Iuran, Aduan, Laporan.
 - **Warga**: Status Iuran, Aduan Saya, Pengumuman.
 
 ### **👥 Manajemen Warga** (Super Admin, Supervisor, Admin)
 - Daftar warga dengan filter pencarian.
 - Status warga (Aktif) dan status iuran (Lunas/Belum).
-- Tombol aksi (Edit, Hapus) - hanya untuk Admin ke atas.
+- Tombol aksi (Edit, Hapus) - untuk Super Admin, Supervisor, Admin.
 
 ### **💰 Manajemen Iuran** (Super Admin, Supervisor, Admin)
 - Daftar iuran dengan status (Lunas/Belum).
@@ -150,16 +150,17 @@ simarukun/
 - Form untuk membuat aduan baru.
 - Filter pencarian.
 
-### **📄 Laporan** (Super Admin, Supervisor)
+### **📄 Laporan** (Super Admin, Supervisor, **Admin**)
 - Laporan Keuangan, Aduan, Warga, Eksekutif.
 - Export laporan.
-- Super Admin: Lihat status Backup dan Webhook.
+- **REVISED**: Sekarang Admin juga bisa akses.
 
-### **💾 Backup** (Super Admin only)
+### **💾 Backup** (Super Admin, **Supervisor**)
 - Buat backup baru.
 - Restore backup.
 - Download backup.
 - Statistik backup.
+- **REVISED**: Sekarang Supervisor juga bisa akses.
 
 ### **🔌 Webhook** (Super Admin only)
 - Monitor status webhook.
@@ -188,8 +189,8 @@ simarukun/
 | **Role** | **Halaman yang Bisa Diakses** |
 |----------|--------------------------------------|
 | **Super Admin** | Semua halaman (`/`, `/warga`, `/iuran`, `/aduan`, `/pengaturan`, `/laporan`, `/backup`, `/webhook`, `/server`) |
-| **Supervisor** | `/`, `/warga`, `/iuran`, `/aduan`, `/pengaturan`, `/laporan` |
-| **Admin** | `/`, `/warga`, `/iuran`, `/aduan`, `/pengaturan` |
+| **Supervisor** | `/`, `/warga`, `/iuran`, `/aduan`, `/pengaturan`, `/laporan`, **`/backup`** |
+| **Admin** | `/`, `/warga`, `/iuran`, `/aduan`, `/pengaturan`, **`/laporan`** |
 | **Warga** | `/`, `/pengaturan` |
 
 ### **2. Proteksi Route**
@@ -197,8 +198,9 @@ simarukun/
 - **Client-side**: Setiap halaman memeriksa `hasAccess()` sebelum render.
 
 ### **3. Tidak Ada Akses Shortcut**
-- Contoh: Warga **tidak bisa** mengakses `/warga`, `/iuran`, `/aduan`.
+- Contoh: Warga **tidak bisa** mengakses `/warga`, `/iuran`, `/aduan`, `/laporan`.
 - Contoh: Admin **tidak bisa** mengakses `/backup`, `/webhook`, `/server`.
+- Contoh: Supervisor **tidak bisa** mengakses `/webhook`, `/server`.
 - Semua percobaan akses ilegal akan **diredirect ke `/login` atau `/`**.
 
 ---
@@ -210,8 +212,8 @@ Anda bisa mencoba login dengan akun demo berikut:
 | **Role** | **Email** | **Password** | **Akses** |
 |----------|-----------|--------------|-----------|
 | Super Admin | `superadmin@simarukun.com` | `superadmin123` | Semua halaman |
-| Supervisor | `ketua@rt01.com` | `supervisor123` | Semua halaman kecuali Backup/Webhook/Server |
-| Admin | `sekretaris@rt01.com` | `admin123` | Warga, Iuran, Aduan, Pengaturan |
+| Supervisor | `ketua@rt01.com` | `supervisor123` | Semua halaman kecuali Webhook/Server |
+| Admin | `sekretaris@rt01.com` | `admin123` | Warga, Iuran, Aduan, **Laporan**, Pengaturan |
 | Warga | `joko@example.com` | `warga123` | Dashboard, Pengaturan |
 
 ---
@@ -244,3 +246,9 @@ Untuk pertanyaan atau dukungan, silakan hubungi:
 ---
 
 **Terima kasih telah menggunakan SimaRukun!** 🙏
+
+---
+
+## 📝 Catatan Revisi Terbaru
+- **Laporan**: Sekarang dapat diakses oleh **Super Admin, Supervisor, dan Admin** (sebelumnya hanya Super Admin & Supervisor).
+- **Backup**: Sekarang dapat diakses oleh **Super Admin dan Supervisor** (sebelumnya hanya Super Admin).
