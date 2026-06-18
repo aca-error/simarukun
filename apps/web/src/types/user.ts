@@ -9,6 +9,8 @@ export interface User {
 }
 
 // Role Access Definitions
+// REVISED: laporan accessible by superadmin, supervisor, admin
+// REVISED: backup accessible by superadmin, supervisor
 export const RoleAccess = {
   superadmin: [
     '/',
@@ -27,14 +29,16 @@ export const RoleAccess = {
     '/iuran',
     '/aduan',
     '/pengaturan',
-    '/laporan'
+    '/laporan',
+    '/backup'
   ],
   admin: [
     '/',
     '/warga',
     '/iuran',
     '/aduan',
-    '/pengaturan'
+    '/pengaturan',
+    '/laporan'
   ],
   warga: [
     '/',
