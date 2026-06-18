@@ -48,8 +48,8 @@ Gunakan akun demo berikut untuk mencoba aplikasi:
 | **Role** | **Email** | **Password** | **Akses** |
 |----------|-----------|--------------|-----------|
 | **Super Admin** | `superadmin@simarukun.com` | `superadmin123` | Semua halaman (termasuk Backup, Webhook, Server) |
-| **Supervisor** | `ketua@rt01.com` | `supervisor123` | Semua halaman kecuali Backup, Webhook, Server |
-| **Admin** | `sekretaris@rt01.com` | `admin123` | Warga, Iuran, Aduan, Laporan, Pengaturan |
+| **Supervisor** | `ketua@rt01.com` | `supervisor123` | Semua halaman kecuali Webhook, Server |
+| **Admin** | `sekretaris@rt01.com` | `admin123` | Warga, Iuran, Aduan, **Laporan**, Pengaturan |
 | **Warga** | `joko@example.com` | `warga123` | Dashboard, Pengaturan |
 
 ---
@@ -91,7 +91,9 @@ Dashboard menampilkan **statistik ringkasan** yang **berbeda tergantung pada rol
 
 ### **Navigasi Berdasarkan Role**
 - Menu sidebar **akan menampilkan opsi yang sesuai** dengan role Anda.
-- Contoh: Super Admin akan melihat menu **Backup**, **Webhook**, **Server**.
+- Contoh: Super Admin akan melihat menu **Backup**, **Webhook**, **Server**. 
+- Contoh: Supervisor akan melihat menu **Backup**, **Laporan**. 
+- Contoh: Admin akan melihat menu **Laporan**. 
 - Contoh: Warga hanya akan melihat menu **Pengaturan**.
 
 ### **Proteksi Route**
@@ -144,15 +146,22 @@ Supervisor memiliki akses ke **semua fitur admin** ditambah:
 - Export laporan.
 - **Tidak bisa** mengakses Laporan Khusus Super Admin.
 
-### **2. Persetujuan**
+### **2. Backup** (`/backup`)
+- **REVISED**: Sekarang Supervisor bisa akses Backup.
+- Buat backup database baru.
+- Restore backup yang sudah ada.
+- Download backup.
+- Lihat statistik backup.
+
+### **3. Persetujuan**
 - Beri persetujuan untuk aduan/laporan krusial.
 - Lihat daftar persetujuan yang tertunda.
 
-### **3. Manajemen Warga, Iuran, Aduan**
+### **4. Manajemen Warga, Iuran, Aduan**
 - Semua fitur yang dimiliki Admin.
 
 ### **Pembatasan**
-- **Tidak bisa** mengakses: `/backup`, `/webhook`, `/server`.
+- **Tidak bisa** mengakses: `/webhook`, `/server`.
 
 ---
 
@@ -196,11 +205,12 @@ Admin memiliki akses untuk **mengelola data RT/RW**:
 | Selesai | ✅ | Aduan sudah selesai. |
 
 ### **4. Laporan** (`/laporan`)
+- **REVISED**: Sekarang Admin bisa akses Laporan.
 - Lihat laporan (Keuangan, Aduan, Warga).
 - Export laporan.
 
 ### **Pembatasan**
-- **Tidak bisa** mengakses: `/backup`, `/webhook`, `/server`, Laporan Eksekutif.
+- **Tidak bisa** mengakses: `/backup`, `/webhook`, `/server`.
 
 ---
 
@@ -247,9 +257,10 @@ Sebagai **Warga**, Anda **hanya bisa**:
 - **Panel Supervisor**:
   - Lihat Laporan Eksekutif
   - Beri Persetujuan
+  - **REVISED**: Kelola Backup
 
 #### **Admin**
-- Tidak ada panel khusus di Pengaturan.
+- **REVISED**: Sekarang Admin bisa melihat Laporan di Dashboard.
 
 #### **Warga**
 - Tidak ada panel khusus di Pengaturan.
@@ -271,8 +282,8 @@ Aplikasi menggunakan **sistem role** untuk membatasi akses:
 | **Role** | **Halaman yang Bisa Diakses** |
 |----------|--------------------------------------|
 | **Super Admin** | Semua halaman (`/`, `/warga`, `/iuran`, `/aduan`, `/pengaturan`, `/laporan`, `/backup`, `/webhook`, `/server`) |
-| **Supervisor** | `/`, `/warga`, `/iuran`, `/aduan`, `/pengaturan`, `/laporan` |
-| **Admin** | `/`, `/warga`, `/iuran`, `/aduan`, `/pengaturan` |
+| **Supervisor** | `/`, `/warga`, `/iuran`, `/aduan`, `/pengaturan`, `/laporan`, **`/backup`** |
+| **Admin** | `/`, `/warga`, `/iuran`, `/aduan`, `/pengaturan`, **`/laporan`** |
 | **Warga** | `/`, `/pengaturan` |
 
 ### **2. Proteksi Route**
@@ -282,6 +293,7 @@ Aplikasi menggunakan **sistem role** untuk membatasi akses:
 ### **3. Tidak Ada Akses Shortcut**
 - Contoh: Jika login sebagai **Warga** dan mencoba membuka `/warga/1` → **diredirect ke `/`**.
 - Contoh: Jika login sebagai **Admin** dan mencoba membuka `/backup` → **diredirect ke `/`**.
+- Contoh: Jika login sebagai **Supervisor** dan mencoba membuka `/webhook` → **diredirect ke `/`**.
 - Contoh: Jika **tidak login** dan mencoba membuka `/warga` → **diredirect ke `/login`**.
 
 ---
@@ -297,11 +309,13 @@ Aplikasi menggunakan **sistem role** untuk membatasi akses:
 - **Lihat laporan eksekutif** untuk memantau kinerja RT/RW.
 - **Beri persetujuan** dengan cepat untuk mempercepat proses.
 - **Monitor aduan** untuk memastikan semua aduan ditangani.
+- **REVISED**: Gunakan fitur Backup untuk mencadangkan data.
 
 ### **Untuk Admin**
 - **Gunakan pencarian** untuk menemukan data dengan cepat.
 - **Periksa status iuran** secara berkala untuk memastikan pembayaran tepat waktu.
 - **Tangani aduan** dengan cepat untuk meningkatkan kepuasan warga.
+- **REVISED**: Lihat laporan untuk memantau status keuangan.
 
 ### **Untuk Warga**
 - **Laporkan aduan** jika ada masalah di lingkungan RT/RW.
@@ -313,10 +327,10 @@ Aplikasi menggunakan **sistem role** untuk membatasi akses:
 ## ❓ FAQ (Pertanyaan yang Sering Diajukan)
 
 ### **1. Mengapa saya tidak bisa mengakses halaman Backup/Webhook/Server?**
-- **Jawaban**: Halaman-halaman tersebut **hanya untuk Super Admin**. Jika Anda login sebagai Supervisor, Admin, atau Warga, Anda tidak memiliki akses.
+- **Jawaban**: Halaman-halaman tersebut **hanya untuk Super Admin dan Supervisor (Backup)**. Jika Anda login sebagai Admin atau Warga, Anda tidak memiliki akses ke halaman ini.
 
 ### **2. Mengapa saya tidak bisa mengakses halaman Laporan?**
-- **Jawaban**: Halaman Laporan **hanya untuk Super Admin dan Supervisor**. Jika Anda login sebagai Admin atau Warga, Anda tidak memiliki akses.
+- **Jawaban**: Halaman Laporan **untuk Super Admin, Supervisor, dan Admin**. Jika Anda login sebagai Warga, Anda tidak memiliki akses.
 
 ### **3. Mengapa saya tidak bisa mengakses halaman Warga/Iuran/Aduan?**
 - **Jawaban**: Halaman-halaman tersebut **hanya untuk Super Admin, Supervisor, dan Admin**. Jika Anda login sebagai Warga, Anda tidak memiliki akses.
@@ -330,8 +344,17 @@ Aplikasi menggunakan **sistem role** untuk membatasi akses:
 ### **6. Bagaimana cara menambahkan warga baru?**
 - **Jawaban**: Login sebagai **Super Admin**, **Supervisor**, atau **Admin**, lalu buka halaman **Warga** dan klik **"Tambah Warga"**.
 
-### **7. Apakah aplikasi ini bisa digunakan di mobile?**
+### **7. Bagaimana cara melihat laporan?**
+- **Jawaban**: Login sebagai **Super Admin**, **Supervisor**, atau **Admin**, lalu buka halaman **Laporan**.
+
+### **8. Apakah aplikasi ini bisa digunakan di mobile?**
 - **Jawaban**: Ya. Aplikasi ini **responsif** dan bisa digunakan di **desktop, tablet, dan mobile**.
+
+---
+
+## 📝 Catatan Revisi
+- **Laporan**: Sekarang dapat diakses oleh **Super Admin, Supervisor, dan Admin** (sebelumnya hanya Super Admin & Supervisor).
+- **Backup**: Sekarang dapat diakses oleh **Super Admin dan Supervisor** (sebelumnya hanya Super Admin).
 
 ---
 
