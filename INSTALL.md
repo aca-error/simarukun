@@ -81,8 +81,8 @@ Anda bisa mencoba login dengan akun demo untuk **4 role yang berbeda**:
 | **Role** | **Email** | **Password** | **Akses** |
 |----------|-----------|--------------|-----------|
 | **Super Admin** | `superadmin@simarukun.com` | `superadmin123` | Semua halaman (termasuk Backup, Webhook, Server) |
-| **Supervisor** | `ketua@rt01.com` | `supervisor123` | Semua halaman kecuali Backup, Webhook, Server |
-| **Admin** | `sekretaris@rt01.com` | `admin123` | Warga, Iuran, Aduan, Laporan, Pengaturan |
+| **Supervisor** | `ketua@rt01.com` | `supervisor123` | Semua halaman kecuali Webhook, Server |
+| **Admin** | `sekretaris@rt01.com` | `admin123` | Warga, Iuran, Aduan, **Laporan**, Pengaturan |
 | **Warga** | `joko@example.com` | `warga123` | Dashboard, Pengaturan |
 
 ### **3. Uji Coba Fitur**
@@ -94,15 +94,15 @@ Anda bisa mencoba login dengan akun demo untuk **4 role yang berbeda**:
 
 #### **Untuk Supervisor:**
 - Lihat dashboard dengan statistik dan Laporan Eksekutif.
-- Akses Warga, Iuran, Aduan, Laporan, Pengaturan.
+- Akses Warga, Iuran, Aduan, Laporan, **Backup**, Pengaturan.
 - Beri persetujuan untuk aduan/laporan.
-- **Tidak bisa** mengakses Backup, Webhook, Server.
+- **Tidak bisa** mengakses Webhook, Server.
 
 #### **Untuk Admin:**
 - Lihat daftar warga, iuran, dan aduan.
 - Tambah/Edit/Hapus data (fitur demo).
-- Akses Warga, Iuran, Aduan, Laporan, Pengaturan.
-- **Tidak bisa** mengakses Backup, Webhook, Server, Laporan Eksekutif.
+- Akses Warga, Iuran, Aduan, **Laporan**, Pengaturan.
+- **Tidak bisa** mengakses Backup, Webhook, Server.
 
 #### **Untuk Warga:**
 - Lihat status iuran dan aduan pribadi di Dashboard.
@@ -113,6 +113,7 @@ Anda bisa mencoba login dengan akun demo untuk **4 role yang berbeda**:
 - Coba akses `/warga` sebagai Warga → **Akan diredirect ke `/`**.
 - Coba akses `/backup` sebagai Admin → **Akan diredirect ke `/`**.
 - Coba akses `/server` sebagai Supervisor → **Akan diredirect ke `/`**.
+- Coba akses `/webhook` sebagai Admin → **Akan diredirect ke `/`**.
 
 ---
 
@@ -175,20 +176,20 @@ simarukun/
 │       │   └── pages/                 # Halaman aplikasi
 │       │       ├── index.tsx         # Dashboard
 │       │       ├── login.tsx          # Halaman Login
-│       │       ├── warga/             # Halaman Warga
+│       │       ├── warga/
+│       │       │   └── index.tsx       # Daftar Warga
+│       │       ├── iuran/
+│       │       │   └── index.tsx       # Daftar Iuran
+│       │       ├── aduan/
+│       │       │   ├── index.tsx       # Daftar Aduan
+│       │       │   └── buat.tsx        # Buat Aduan
+│       │       ├── laporan/           # Laporan (superadmin, supervisor, admin)
 │       │       │   └── index.tsx
-│       │       ├── iuran/             # Halaman Iuran
+│       │       ├── backup/            # Backup (superadmin, supervisor)
 │       │       │   └── index.tsx
-│       │       ├── aduan/             # Halaman Aduan
-│       │       │   ├── index.tsx
-│       │       │   └── buat.tsx
-│       │       ├── laporan/           # Halaman Laporan
+│       │       ├── webhook/           # Webhook (superadmin only)
 │       │       │   └── index.tsx
-│       │       ├── backup/            # Halaman Backup
-│       │       │   └── index.tsx
-│       │       ├── webhook/           # Halaman Webhook
-│       │       │   └── index.tsx
-│       │       ├── server/            # Halaman Server
+│       │       ├── server/            # Server (superadmin only)
 │       │       │   └── index.tsx
 │       │       └── pengaturan.tsx     # Halaman Pengaturan
 │       ├── package.json
@@ -225,7 +226,11 @@ simarukun/
    - Setiap role memiliki akses yang berbeda.
    - Proteksi route di server-side (middleware) dan client-side.
 
-4. **Untuk Production**:
+4. **Revisi Terbaru**:
+   - **Laporan**: Sekarang Admin juga bisa akses.
+   - **Backup**: Sekarang Supervisor juga bisa akses.
+
+5. **Untuk Production**:
    - Jalankan `npm run build` untuk membuat build production.
    - Gunakan `npm run start` untuk menjalankan server production.
 
