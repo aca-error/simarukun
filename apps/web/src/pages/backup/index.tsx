@@ -53,27 +53,38 @@ export default function Backup() {
     }
   };
 
+  // REVISED: backup accessible by superadmin AND supervisor
+  const getAccessNote = () => {
+    if (user.role === 'superadmin') {
+      return 'Halaman ini dapat diakses oleh Super Admin dan Supervisor.';
+    } else {
+      return 'Halaman ini dapat diakses oleh Super Admin dan Supervisor.';
+    }
+  };
+
   return (
     <Layout>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-900">Kelola Backup</h1>
-          <button
-            onClick={handleBackup}
-            disabled={isBackingUp}
-            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center disabled:opacity-50"
-          >
-            <RefreshCw className={`h-5 w-5 mr-2 ${isBackingUp ? 'animate-spin' : ''}`} />
-            {isBackingUp ? 'Membuat Backup...' : 'Buat Backup Baru'}
-          </button>
+          {(user.role === 'superadmin' || user.role === 'supervisor') && (
+            <button
+              onClick={handleBackup}
+              disabled={isBackingUp}
+              className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center disabled:opacity-50"
+            >
+              <RefreshCw className={`h-5 w-5 mr-2 ${isBackingUp ? 'animate-spin' : ''}`} />
+              {isBackingUp ? 'Membuat Backup...' : 'Buat Backup Baru'}
+            </button>
+          )}
         </div>
         
         <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
           <p className="text-sm text-purple-800">
-            <strong>Catatan:</strong> Halaman ini <strong>hanya dapat diakses oleh Super Admin</strong>.
+            <strong>Catatan:</strong> {getAccessNote()}
           </p>
           <p className="text-xs text-purple-600 mt-1">
-            {getRoleDescription('superadmin')}
+            {getRoleDescription(user.role)}
           </p>
         </div>
         
@@ -108,12 +119,14 @@ export default function Backup() {
                       >
                         <Download className="h-4 w-4" />
                       </button>
-                      <button
-                        onClick={() => handleRestore(backup.id)}
-                        className="text-green-600 hover:text-green-800"
-                      >
-                        <Upload className="h-4 w-4" />
-                      </button>
+                      {(user.role === 'superadmin' || user.role === 'supervisor') && (
+                        <button
+                          onClick={() => handleRestore(backup.id)}
+                          className="text-green-600 hover:text-green-800"
+                        >
+                          <Upload className="h-4 w-4" />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
