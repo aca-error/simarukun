@@ -8,7 +8,6 @@ on:
 
 env:
   NODE_VERSION: 18
-  DOCKER_COMPOSE_VERSION: 2.24.5
 
 jobs:
   # Backend Tests
@@ -97,7 +96,8 @@ jobs:
 
       - name: Build and push Docker images
         run: |
-          docker-compose -f docker/dev/docker-compose.yml build
+          cd docker/dev
+          docker-compose build
           docker tag simarukun-api:latest ${{ secrets.DOCKER_HUB_USERNAME }}/simarukun-api:staging
           docker tag simarukun-web:latest ${{ secrets.DOCKER_HUB_USERNAME }}/simarukun-web:staging
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/simarukun-api:staging
@@ -136,7 +136,8 @@ jobs:
 
       - name: Build and push Docker images
         run: |
-          docker-compose -f docker/dev/docker-compose.yml build
+          cd docker/dev
+          docker-compose build
           docker tag simarukun-api:latest ${{ secrets.DOCKER_HUB_USERNAME }}/simarukun-api:production
           docker tag simarukun-api:latest ${{ secrets.DOCKER_HUB_USERNAME }}/simarukun-api:v1.0.0
           docker tag simarukun-web:latest ${{ secrets.DOCKER_HUB_USERNAME }}/simarukun-web:production
