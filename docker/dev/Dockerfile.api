@@ -1,0 +1,24 @@
+# Dockerfile for NestJS API (Development)
+# Base image
+FROM node:18-alpine AS development
+
+# Set working directory
+WORKDIR /usr/src/app
+
+# Copy package files
+COPY apps/api/package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy source files
+COPY apps/api/prisma ./prisma/
+COPY apps/api/src ./src/
+COPY apps/api/tsconfig.json ./
+COPY apps/api/nest-cli.json ./
+
+# Expose port
+EXPOSE 3000
+
+# Start command
+CMD ["npm", "run", "start:dev"]
