@@ -1,0 +1,26 @@
+# Dockerfile for Next.js Web (Development)
+# Base image
+FROM node:18-alpine AS development
+
+# Set working directory
+WORKDIR /usr/src/app
+
+# Copy package files
+COPY apps/web/package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy source files
+COPY apps/web/src ./src/
+COPY apps/web/public ./public/
+COPY apps/web/next.config.js ./
+COPY apps/web/tsconfig.json ./
+COPY apps/web/tailwind.config.js ./
+COPY apps/web/postcss.config.js ./
+
+# Expose port
+EXPOSE 3000
+
+# Start command
+CMD ["npm", "run", "dev"]
