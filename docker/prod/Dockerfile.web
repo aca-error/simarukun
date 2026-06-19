@@ -1,0 +1,49 @@
+# Dockerfile for Next.js Web (Production)
+# Stage 1: Build
+FROM node:18-alpine AS builder
+
+WORKDIR /usr/src/app
+
+# Copy package files
+COPY apps/web/package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy source files
+COPY apps/web/src ./src/
+COPY apps/web/public ./public/
+COPY apps/web/next.config.js ./
+COPY apps/web/tsconfig.json ./
+COPY apps/web/tailwind.config.js ./
+COPY apps/web/postcss.config.js ./
+
+# Build application
+RUN npm run build
+
+# Stage 2: Production
+FROM node:18-alpine AS production
+
+WORKDIR /usr/src/app
+
+# Copy built files from builder
+COPY --from=builder /usr/src/app/.next ./.next
+COPY --from=builder /usr/src/app/public ./public
+COPY --from=builder /usr/src/app/package*.json ./
+COPY --from=builder /usr/src/app/node_modules ./node_modules
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001
+
+# Change ownership
+RUN chown -R nextjs:nodejs /usr/src/app
+
+# Switch to non-root user
+USER nextjs
+
+# Expose port
+EXPOSE 3000
+
+# Start command
+CMD ["node", "server.js"]
