@@ -15,6 +15,7 @@ import { WebhookModule } from './modules/webhook/webhook.module';
 import { ServerModule } from './modules/server/server.module';
 import { HealthModule } from './modules/health/health.module';
 import { LoggerModule } from './modules/logger/logger.module';
+import { MonitoringModule } from './modules/monitoring/monitoring.module';
 
 @Module({
   imports: [
@@ -79,6 +80,7 @@ import { LoggerModule } from './modules/logger/logger.module';
     ServerModule,
     HealthModule,
     LoggerModule,
+    MonitoringModule,
   ],
   controllers: [AppController],
   providers: [AppService],
