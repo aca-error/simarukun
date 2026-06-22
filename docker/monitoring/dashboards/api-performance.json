@@ -1,0 +1,125 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "api-performance",
+    "title": "API Performance",
+    "tags": ["api", "performance", "monitoring"],
+    "timezone": "browser",
+    "schemaVersion": 30,
+    "version": 1,
+    "refresh": "30s",
+    "panels": [
+      {
+        "type": "stat",
+        "title": "Request Rate",
+        "gridPos": { "h": 8, "w": 6, "x": 0, "y": 0 },
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total[1m])) by (method)",
+            "legendFormat": "{{method}}"
+          }
+        ],
+        "options": {
+          "colorMode": "value",
+          "graphMode": "none",
+          "justifyMode": "auto",
+          "orientation": "auto"
+        }
+      },
+      {
+        "type": "stat",
+        "title": "Error Rate",
+        "gridPos": { "h": 8, "w": 6, "x": 6, "y": 0 },
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total{status=~\"4..|5..\"}[1m])) by (status)",
+            "legendFormat": "HTTP {{status}}"
+          }
+        ],
+        "options": {
+          "colorMode": "value",
+          "graphMode": "none",
+          "justifyMode": "auto"
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Response Time (95th Percentile)",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[1m])) by (le, method, path))",
+            "legendFormat": "{{method}} {{path}}"
+          }
+        ],
+        "options": {
+          "legend": { "displayMode": "table", "placement": "bottom" }
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Request Count by Method",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total[1m])) by (method)",
+            "legendFormat": "{{method}}"
+          }
+        ]
+      },
+      {
+        "type": "graph",
+        "title": "Request Count by Status",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total[1m])) by (status)",
+            "legendFormat": "HTTP {{status}}"
+          }
+        ]
+      },
+      {
+        "type": "graph",
+        "title": "Request Duration Distribution",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+        "targets": [
+          {
+            "expr": "sum(rate(http_request_duration_seconds_bucket[1m])) by (le)",
+            "legendFormat": "{{le}}"
+          }
+        ]
+      },
+      {
+        "type": "graph",
+        "title": "Active Connections",
+        "gridPos": { "h": 8, "w": 6, "x": 12, "y": 16 },
+        "targets": [
+          {
+            "expr": "active_connections",
+            "legendFormat": "Connections"
+          }
+        ]
+      },
+      {
+        "type": "graph",
+        "title": "Error Rate by Endpoint",
+        "gridPos": { "h": 8, "w": 6, "x": 18, "y": 16 },
+        "targets": [
+          {
+            "expr": "sum(rate(http_errors_total[1m])) by (path)",
+            "legendFormat": "{{path}}"
+          }
+        ]
+      }
+    ],
+    "templating": {
+      "list": []
+    },
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    }
+  },
+  "folderId": 0,
+  "overwrite": true
+}
