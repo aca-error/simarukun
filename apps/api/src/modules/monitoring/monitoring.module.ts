@@ -3,6 +3,7 @@ import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { MetricsController } from './metrics.controller';
 import { MetricsService } from './metrics.service';
 import { SentryService } from './sentry.service';
+import { MetricsInterceptor } from './metrics.interceptor';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { SentryService } from './sentry.service';
     }),
   ],
   controllers: [MetricsController],
-  providers: [MetricsService, SentryService],
-  exports: [MetricsService, SentryService],
+  providers: [MetricsService, SentryService, MetricsInterceptor],
+  exports: [MetricsService, SentryService, MetricsInterceptor],
 })
 export class MonitoringModule {}
