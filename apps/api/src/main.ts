@@ -5,6 +5,8 @@ import * as cookieParser from 'cookie-parser';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import * as Sentry from '@sentry/node';
 import { SentryService } from './modules/monitoring/sentry.service';
+import { LoggerService } from './modules/logger/logger.service';
+import { LoggerInterceptor } from './modules/logger/logger.interceptor';
 
 async function bootstrap() {
   // Initialize Sentry for error tracking (Tahap 3)
@@ -91,12 +93,17 @@ async function bootstrap() {
   // Tracing Handler - should be before all other middleware
   app.use(Sentry.Handlers.tracingHandler());
 
+  // Logger Interceptor - Global request logging
+  const logger = new LoggerService('Main', { get: (key: string) => process.env[key] } as any);
+  app.useGlobalInterceptors(new LoggerInterceptor(logger));
+
   const port = process.env.PORT || 3001;
   await app.listen(port);
   
   // Log startup
   console.log(`Application is running on: http://localhost:${port}`);
   console.log(`Metrics available at: http://localhost:${port}/api/metrics`);
+  console.log(`Health check: http://localhost:${port}/api/health`);
   
   // Sentry Error Handler - should be the last middleware
   app.use(Sentry.Handlers.errorHandler());
