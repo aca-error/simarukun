@@ -3,8 +3,24 @@ import { AppModule } from './app.module';
 import * as helmet from 'helmet';
 import * as cookieParser from 'cookie-parser';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import * as Sentry from '@sentry/node';
+import { SentryService } from './modules/monitoring/sentry.service';
 
 async function bootstrap() {
+  // Initialize Sentry for error tracking (Tahap 3)
+  const sentryService = new SentryService({ get: (key: string) => process.env[key] } as any);
+  
+  // Flush Sentry before process exit
+  process.on('unhandledRejection', (err: Error) => {
+    Sentry.captureException(err);
+    Sentry.flush(2000).then(() => process.exit(1));
+  });
+
+  process.on('uncaughtException', (err: Error) => {
+    Sentry.captureException(err);
+    Sentry.flush(2000).then(() => process.exit(1));
+  });
+
   const app = await NestFactory.create(AppModule);
 
   // ========== SECURITY MIDDLEWARES (PHASE 1) ==========
@@ -67,9 +83,23 @@ async function bootstrap() {
   // Cookie Parser for CSRF
   app.use(cookieParser());
 
-  const port = process.env.PORT || 3000;
+  // ========== MONITORING (PHASE 3) ==========
+  
+  // Sentry Request Handler - should be before all other middleware
+  app.use(Sentry.Handlers.requestHandler());
+  
+  // Tracing Handler - should be before all other middleware
+  app.use(Sentry.Handlers.tracingHandler());
+
+  const port = process.env.PORT || 3001;
   await app.listen(port);
+  
+  // Log startup
   console.log(`Application is running on: http://localhost:${port}`);
+  console.log(`Metrics available at: http://localhost:${port}/api/metrics`);
+  
+  // Sentry Error Handler - should be the last middleware
+  app.use(Sentry.Handlers.errorHandler());
 }
 
 bootstrap();
