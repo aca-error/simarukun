@@ -1,0 +1,171 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "alerts",
+    "title": "Alerts Dashboard",
+    "tags": ["alerts", "monitoring"],
+    "timezone": "browser",
+    "schemaVersion": 30,
+    "version": 1,
+    "refresh": "1m",
+    "panels": [
+      {
+        "type": "alertlist",
+        "title": "Active Alerts",
+        "gridPos": { "h": 16, "w": 24, "x": 0, "y": 0 },
+        "options": {
+          "show": "current",
+          "sortOrder": "desc",
+          "stateFilter": ["alerting", "paused"]
+        }
+      },
+      {
+        "type": "stat",
+        "title": "Total Active Alerts",
+        "gridPos": { "h": 8, "w": 6, "x": 0, "y": 16 },
+        "targets": [
+          {
+            "expr": "ALERTS{alertstate=\"firing\"}",
+            "legendFormat": "Firing"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 1 },
+              { "color": "red", "value": 5 }
+            ]
+          }
+        }
+      },
+      {
+        "type": "stat",
+        "title": "Critical Alerts",
+        "gridPos": { "h": 8, "w": 6, "x": 6, "y": 16 },
+        "targets": [
+          {
+            "expr": "ALERTS{alertstate=\"firing\", severity=\"critical\"}",
+            "legendFormat": "Critical"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "colorMode": "value",
+            "graphMode": "none"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 1 },
+              { "color": "red", "value": 3 }
+            ]
+          }
+        }
+      },
+      {
+        "type": "stat",
+        "title": "Warning Alerts",
+        "gridPos": { "h": 8, "w": 6, "x": 12, "y": 16 },
+        "targets": [
+          {
+            "expr": "ALERTS{alertstate=\"firing\", severity=\"warning\"}",
+            "legendFormat": "Warning"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "colorMode": "value",
+            "graphMode": "none"
+          }
+        }
+      },
+      {
+        "type": "stat",
+        "title": "Resolved Alerts (Last 24h)",
+        "gridPos": { "h": 8, "w": 6, "x": 18, "y": 16 },
+        "targets": [
+          {
+            "expr": "increase(ALERTS{alertstate=\"resolved\"}[24h])",
+            "legendFormat": "Resolved"
+          }
+        ]
+      },
+      {
+        "type": "graph",
+        "title": "Alerts Over Time",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+        "targets": [
+          {
+            "expr": "ALERTS{alertstate=\"firing\"}",
+            "legendFormat": "Firing"
+          },
+          {
+            "expr": "ALERTS{alertstate=\"resolved\"}",
+            "legendFormat": "Resolved"
+          }
+        ]
+      },
+      {
+        "type": "graph",
+        "title": "Alerts by Severity",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
+        "targets": [
+          {
+            "expr": "ALERTS{alertstate=\"firing\"}",
+            "legendFormat": "{{severity}}"
+          }
+        ]
+      },
+      {
+        "type": "graph",
+        "title": "Alerts by Category",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 32 },
+        "targets": [
+          {
+            "expr": "ALERTS{alertstate=\"firing\"}",
+            "legendFormat": "{{category}}"
+          }
+        ]
+      },
+      {
+        "type": "graph",
+        "title": "Alert Duration",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 32 },
+        "targets": [
+          {
+            "expr": "ALERTS{alertstate=\"firing\"}",
+            "legendFormat": "{{alertname}}"
+          }
+        ]
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "severity",
+          "type": "query",
+          "query": "label_values(ALERTS, severity)"
+        },
+        {
+          "name": "category",
+          "type": "query",
+          "query": "label_values(ALERTS, category)"
+        }
+      ]
+    },
+    "time": {
+      "from": "now-24h",
+      "to": "now"
+    }
+  },
+  "folderId": 0,
+  "overwrite": true
+}
