@@ -1,0 +1,83 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  # Scrape logs from all containers
+  - job_name: containers
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: varlogs
+          __path__: /var/log/*log
+
+  # Scrape Docker container logs
+  - job_name: docker
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+    relabel_configs:
+      - source_labels: [__meta_docker_container_name]
+        target_label: container
+      - source_labels: [__meta_docker_container_log_stream]
+        target_label: log_stream
+
+  # Scrape API logs
+  - job_name: api-logs
+    static_configs:
+      - targets: [localhost]
+        labels:
+          job: api
+          app: simarukun-api
+          __path__: /var/log/simarukun/api/*.log
+
+  # Scrape Web logs
+  - job_name: web-logs
+    static_configs:
+      - targets: [localhost]
+        labels:
+          job: web
+          app: simarukun-web
+          __path__: /var/log/simarukun/web/*.log
+
+  # Scrape Nginx logs
+  - job_name: nginx-logs
+    static_configs:
+      - targets: [localhost]
+        labels:
+          job: nginx
+          __path__: /var/log/nginx/*.log
+
+pipeline_stages:
+  # Parse Docker JSON logs
+  - docker: {}
+
+  # Parse common log formats
+  - regex:
+      expression: '^(?P<time>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) (?P<level>\w+) (?P<message>.*)$'
+
+  # Parse JSON logs
+  - json:
+      expressions:
+        level: level
+        message: message
+        timestamp: timestamp
+        stack: stack
+
+  # Add labels based on log content
+  - labels:
+      level:
+      app:
+      instance:
+
+  # Drop unnecessary labels
+  - drop:
+      expression: '^__.*__$'
+      drop_original: true
