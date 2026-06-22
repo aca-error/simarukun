@@ -7,6 +7,7 @@ import * as Sentry from '@sentry/node';
 import { SentryService } from './modules/monitoring/sentry.service';
 import { LoggerService } from './modules/logger/logger.service';
 import { LoggerInterceptor } from './modules/logger/logger.interceptor';
+import { MetricsInterceptor } from './modules/monitoring/metrics.interceptor';
 
 async function bootstrap() {
   // Initialize Sentry for error tracking (Tahap 3)
@@ -95,7 +96,10 @@ async function bootstrap() {
 
   // Logger Interceptor - Global request logging
   const logger = new LoggerService('Main', { get: (key: string) => process.env[key] } as any);
-  app.useGlobalInterceptors(new LoggerInterceptor(logger));
+  app.useGlobalInterceptors(
+    new LoggerInterceptor(logger),
+    new MetricsInterceptor(new MetricsService({} as any, {} as any, {} as any, {} as any, {} as any, {} as any, {} as any)),
+  );
 
   const port = process.env.PORT || 3001;
   await app.listen(port);
