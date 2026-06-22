@@ -1,0 +1,114 @@
+route:
+  group_by: ['alertname', 'severity', 'category']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 3h
+  receiver: 'default-receiver'
+
+  routes:
+    # Critical alerts - immediate notification
+    - match:
+        severity: 'critical'
+      receiver: 'critical-receiver'
+      group_wait: 10s
+      group_interval: 1m
+      repeat_interval: 1h
+
+    # Warning alerts - batch notifications
+    - match:
+        severity: 'warning'
+      receiver: 'warning-receiver'
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 3h
+
+    # API-specific alerts
+    - match:
+        category: 'api'
+      receiver: 'api-receiver'
+
+    # Database-specific alerts
+    - match:
+        category: 'database'
+      receiver: 'database-receiver'
+
+    # Server-specific alerts
+    - match:
+        category: 'server'
+      receiver: 'server-receiver'
+
+    # Security alerts - immediate
+    - match:
+        category: 'security'
+      receiver: 'security-receiver'
+      group_wait: 5s
+      group_interval: 30s
+      repeat_interval: 1h
+
+receivers:
+  # Default receiver (fallback)
+  - name: 'default-receiver'
+    email_configs:
+      - to: 'admin@simarukun.com'
+        send_resolved: true
+        html_email: true
+        headers:
+          subject: '[SimaRukun Alert] {{ .CommonLabels.alertname }}'
+
+  # Critical alerts receiver
+  - name: 'critical-receiver'
+    email_configs:
+      - to: 'admin@simarukun.com'
+        send_resolved: true
+        html_email: true
+        headers:
+          subject: '[CRITICAL] {{ .CommonLabels.alertname }} - {{ .CommonLabels.instance }}'
+
+  # Warning alerts receiver
+  - name: 'warning-receiver'
+    email_configs:
+      - to: 'admin@simarukun.com'
+        send_resolved: true
+        html_email: true
+        headers:
+          subject: '[WARNING] {{ .CommonLabels.alertname }} - {{ .CommonLabels.instance }}'
+
+  # API-specific receiver
+  - name: 'api-receiver'
+    email_configs:
+      - to: 'api-team@simarukun.com'
+        send_resolved: true
+
+  # Database-specific receiver
+  - name: 'database-receiver'
+    email_configs:
+      - to: 'db-team@simarukun.com'
+        send_resolved: true
+
+  # Server-specific receiver
+  - name: 'server-receiver'
+    email_configs:
+      - to: 'infra-team@simarukun.com'
+        send_resolved: true
+
+  # Security alerts receiver
+  - name: 'security-receiver'
+    email_configs:
+      - to: 'security@simarukun.com'
+        send_resolved: true
+
+inhibit_rules:
+  # Inhibit warning alerts if critical alert is firing for the same group
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'group', 'namespace']
+
+  # Inhibit API alerts if server is down
+  - source_match:
+      severity: 'critical'
+      category: 'server'
+    target_match:
+      category: 'api'
+    equal: ['instance']
