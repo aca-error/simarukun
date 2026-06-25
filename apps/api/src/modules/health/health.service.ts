@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 
-interface HealthCheckResult {
+export interface HealthCheckResult {
   status: 'ok' | 'error' | 'degraded';
   timestamp: string;
   uptime: number;
@@ -12,7 +12,7 @@ interface HealthCheckResult {
   checks?: Record<string, HealthCheckStatus>;
 }
 
-interface HealthCheckStatus {
+export interface HealthCheckStatus {
   status: 'ok' | 'error' | 'degraded';
   message?: string;
   latency?: number;

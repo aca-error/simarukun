@@ -9,17 +9,11 @@ export class MetricsController extends PrometheusController {
     super();
   }
 
-  /**
-   * Get all metrics in Prometheus format
-   */
   @Get()
-  async getMetrics(@Res() res: Response) {
-    return super.getMetrics(res);
+  async index(@Res({ passthrough: true }) response: Response) {
+    return super.index(response);
   }
 
-  /**
-   * Get custom metrics summary
-   */
   @Get('summary')
   async getMetricsSummary() {
     return {

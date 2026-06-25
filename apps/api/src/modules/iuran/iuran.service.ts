@@ -9,6 +9,7 @@ import { Iuran } from './entities/iuran.entity';
 import { CreateIuranDto } from './dto/create-iuran.dto';
 import { UpdateIuranDto } from './dto/update-iuran.dto';
 import { User } from '../users/entities/user.entity';
+import { UserRole } from '../../common/enums/user-role.enum';
 
 export interface PaginatedResult<T> {
   data: T[];
@@ -117,7 +118,11 @@ export class IuranService {
     const iuran = await this.findOne(id);
 
     // Check if user has permission to update this iuran
-    if (iuran.userId !== currentUser.id && currentUser.role !== 'SUPERADMIN' && currentUser.role !== 'SUPERVISOR') {
+    if (
+      iuran.userId !== currentUser.id &&
+      currentUser.role !== UserRole.SUPERADMIN &&
+      currentUser.role !== UserRole.SUPERVISOR
+    ) {
       throw new ForbiddenException('You do not have permission to update this iuran');
     }
 
@@ -137,7 +142,11 @@ export class IuranService {
     const iuran = await this.findOne(id);
 
     // Check if user has permission to delete this iuran
-    if (iuran.userId !== currentUser.id && currentUser.role !== 'SUPERADMIN' && currentUser.role !== 'SUPERVISOR') {
+    if (
+      iuran.userId !== currentUser.id &&
+      currentUser.role !== UserRole.SUPERADMIN &&
+      currentUser.role !== UserRole.SUPERVISOR
+    ) {
       throw new ForbiddenException('You do not have permission to delete this iuran');
     }
 
@@ -209,7 +218,11 @@ export class IuranService {
     const iuran = await this.findOne(id);
 
     // Check if user has permission to update this iuran
-    if (iuran.userId !== currentUser.id && currentUser.role !== 'SUPERADMIN' && currentUser.role !== 'SUPERVISOR') {
+    if (
+      iuran.userId !== currentUser.id &&
+      currentUser.role !== UserRole.SUPERADMIN &&
+      currentUser.role !== UserRole.SUPERVISOR
+    ) {
       throw new ForbiddenException('You do not have permission to update this iuran');
     }
 

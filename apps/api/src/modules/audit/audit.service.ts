@@ -27,11 +27,11 @@ export class AuditService {
     userAgent: string | null = null,
   ): Promise<AuditLog> {
     const auditLog = this.auditLogRepository.create({
-      action,
+      action: action,
       metadata,
-      ipAddress: ipAddress || null,
-      userAgent: userAgent || null,
-      user: user || null,
+      ipAddress: ipAddress ?? undefined,
+      userAgent: userAgent ?? undefined,
+      user: user ?? undefined,
     });
 
     return this.auditLogRepository.save(auditLog);

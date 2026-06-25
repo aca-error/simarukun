@@ -1,7 +1,6 @@
 import { Injectable, Logger, ConsoleLogger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { format, createLogger, transports, Logger as WinstonLogger } from 'winston';
-import { combine, timestamp, printf, colorize, json } from 'winston';
+import * as winston from 'winston';
 
 interface LogContext {
   userId?: string;
@@ -23,42 +22,40 @@ interface LogMessage {
 
 @Injectable()
 export class LoggerService extends ConsoleLogger {
-  private readonly winstonLogger: WinstonLogger;
-  private readonly context: string;
+  private readonly winstonLogger: winston.Logger;
+  private readonly loggerContext: string;
 
   constructor(
     context: string,
     private readonly configService: ConfigService,
   ) {
     super(context);
-    this.context = context;
+    this.loggerContext = context;
 
-    // Create Winston logger
-    this.winstonLogger = createLogger({
+    this.winstonLogger = winston.createLogger({
       level: this.configService.get<string>('LOG_LEVEL') || 'info',
-      format: combine(
-        timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-        json(),
+      format: winston.format.combine(
+        winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+        winston.format.json(),
       ),
       transports: [
-        new transports.Console({
-          format: combine(
-            colorize(),
-            printf(({ level, message, timestamp, context, ...meta }) => {
-              let contextStr = context ? `[${context}]` : '';
-              let metaStr = Object.keys(meta).length > 0 
-                ? ` ${JSON.stringify(meta)}` 
-                : '';
+        new winston.transports.Console({
+          format: winston.format.combine(
+            winston.format.colorize(),
+            winston.format.printf(({ level, message, timestamp, context, ...meta }) => {
+              const contextStr = context ? `[${context}]` : '';
+              const metaStr =
+                Object.keys(meta).length > 0 ? ` ${JSON.stringify(meta)}` : '';
               return `${timestamp} [${level}] ${contextStr} ${message}${metaStr}`;
             }),
           ),
         }),
-        new transports.File({
+        new winston.transports.File({
           filename: 'logs/combined.log',
-          maxsize: 10 * 1024 * 1024, // 10MB
+          maxsize: 10 * 1024 * 1024,
           maxFiles: 5,
         }),
-        new transports.File({
+        new winston.transports.File({
           filename: 'logs/error.log',
           level: 'error',
           maxsize: 10 * 1024 * 1024,
@@ -75,7 +72,7 @@ export class LoggerService extends ConsoleLogger {
   log(message: string, context?: string, meta?: LogContext) {
     this.winstonLogger.info({
       message,
-      context: context || this.context,
+      context: context || this.loggerContext,
       ...meta,
     });
     super.log(message, context);
@@ -87,7 +84,7 @@ export class LoggerService extends ConsoleLogger {
   error(message: string, trace?: string, context?: string, meta?: LogContext) {
     this.winstonLogger.error({
       message,
-      context: context || this.context,
+      context: context || this.loggerContext,
       trace,
       ...meta,
     });
@@ -100,7 +97,7 @@ export class LoggerService extends ConsoleLogger {
   warn(message: string, context?: string, meta?: LogContext) {
     this.winstonLogger.warn({
       message,
-      context: context || this.context,
+      context: context || this.loggerContext,
       ...meta,
     });
     super.warn(message, context);
@@ -112,7 +109,7 @@ export class LoggerService extends ConsoleLogger {
   debug(message: string, context?: string, meta?: LogContext) {
     this.winstonLogger.debug({
       message,
-      context: context || this.context,
+      context: context || this.loggerContext,
       ...meta,
     });
     super.debug(message, context);
@@ -124,7 +121,7 @@ export class LoggerService extends ConsoleLogger {
   verbose(message: string, context?: string, meta?: LogContext) {
     this.winstonLogger.verbose({
       message,
-      context: context || this.context,
+      context: context || this.loggerContext,
       ...meta,
     });
     super.verbose(message, context);
@@ -135,7 +132,7 @@ export class LoggerService extends ConsoleLogger {
    */
   custom(level: string, message: string, context?: string, meta?: LogContext) {
     this.winstonLogger.log(level, message, {
-      context: context || this.context,
+      context: context || this.loggerContext,
       ...meta,
     });
   }

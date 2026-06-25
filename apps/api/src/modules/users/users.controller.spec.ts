@@ -19,6 +19,7 @@ import { NotFoundException, ForbiddenException } from '@nestjs/common';
 const mockUsersService = {
   findAll: jest.fn(),
   findOne: jest.fn(),
+  findById: jest.fn(),
   create: jest.fn(),
   update: jest.fn(),
   remove: jest.fn(),
@@ -102,12 +103,12 @@ describe('UsersController', () => {
         updatedAt: new Date(),
       };
 
-      mockUsersService.findOne.mockResolvedValue(mockUser);
+      mockUsersService.findById.mockResolvedValue(mockUser);
 
       const result = await controller.findOne('1', mockRequest as any);
 
       expect(result).toEqual(mockUser);
-      expect(mockUsersService.findOne).toHaveBeenCalledWith('1');
+      expect(mockUsersService.findById).toHaveBeenCalledWith('1');
     });
   });
 

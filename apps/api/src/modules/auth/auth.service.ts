@@ -224,7 +224,6 @@ export class AuthService {
       throw new UnauthorizedException('User not found');
     }
 
-    const { password: _, ...userWithoutPassword } = user;
-    return userWithoutPassword as Omit<User, 'password'>;
+    return user;
   }
 }

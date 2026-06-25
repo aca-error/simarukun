@@ -24,7 +24,7 @@ export class AuthController {
    * Login user
    */
   @Post('login')
-  @Throttle('short') // 5 requests per second
+  @Throttle(5, 1000)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login user' })
   @ApiBody({
@@ -50,7 +50,7 @@ export class AuthController {
    * Register new user
    */
   @Post('register')
-  @Throttle('short') // 5 requests per second
+  @Throttle(5, 1000)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Register new user' })
   @ApiBody({
@@ -80,7 +80,7 @@ export class AuthController {
    * Refresh access token
    */
   @Post('refresh')
-  @Throttle('medium') // 100 requests per minute
+  @Throttle(100, 60000)
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -95,7 +95,7 @@ export class AuthController {
    * Logout user
    */
   @Post('logout')
-  @Throttle('medium') // 100 requests per minute
+  @Throttle(100, 60000)
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -110,7 +110,7 @@ export class AuthController {
    * Get current user profile
    */
   @Get('profile')
-  @Throttle('medium') // 100 requests per minute
+  @Throttle(100, 60000)
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user profile' })

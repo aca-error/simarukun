@@ -29,15 +29,10 @@ export class IuranController {
 
   /**
    * Get all iuran records (with pagination)
-   * @param page - Page number (default: 1)
-   * @param limit - Items per page (default: 10)
-   * @param status - Filter by status (optional)
-   * @param tahun - Filter by year (optional)
-   * @param bulan - Filter by month (optional)
    */
   @Get()
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR, UserRole.ADMIN)
-  @Throttle('medium') // Rate limiting: 100 requests per minute
+  @Throttle(100, 60000)
   @ApiOperation({ summary: 'Get all iuran records (Super Admin, Supervisor, Admin)' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
@@ -56,12 +51,40 @@ export class IuranController {
   }
 
   /**
+   * Get iuran report (summary)
+   */
+  @Get('report')
+  @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR, UserRole.ADMIN)
+  @Throttle(100, 60000)
+  @ApiOperation({ summary: 'Get iuran report (Super Admin, Supervisor, Admin)' })
+  @ApiQuery({ name: 'tahun', required: false, type: Number })
+  @ApiQuery({ name: 'bulan', required: false, type: Number })
+  async getReport(
+    @Query('tahun') tahun?: number,
+    @Query('bulan') bulan?: number,
+    @Request() req?,
+  ) {
+    return this.iuranService.getReport(tahun, bulan);
+  }
+
+  /**
+   * Get iuran history for a user
+   */
+  @Get('user/:userId')
+  @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR, UserRole.ADMIN, UserRole.WARGA)
+  @Throttle(100, 60000)
+  @ApiOperation({ summary: 'Get iuran history for a user' })
+  @ApiParam({ name: 'userId', type: String })
+  async findByUser(@Param('userId') userId: string, @Request() req) {
+    return this.iuranService.findByUser(userId);
+  }
+
+  /**
    * Get iuran by ID
-   * @param id - Iuran ID
    */
   @Get(':id')
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR, UserRole.ADMIN, UserRole.WARGA)
-  @Throttle('medium')
+  @Throttle(100, 60000)
   @ApiOperation({ summary: 'Get iuran by ID' })
   @ApiParam({ name: 'id', type: String })
   async findOne(@Param('id') id: string, @Request() req) {
@@ -70,11 +93,10 @@ export class IuranController {
 
   /**
    * Create a new iuran record
-   * @param createIuranDto - Iuran data
    */
   @Post()
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR, UserRole.ADMIN)
-  @Throttle('medium')
+  @Throttle(100, 60000)
   @ApiOperation({ summary: 'Create a new iuran record (Super Admin, Supervisor, Admin)' })
   async create(@Body() createIuranDto: CreateIuranDto, @Request() req) {
     return this.iuranService.create(createIuranDto, req.user);
@@ -82,12 +104,10 @@ export class IuranController {
 
   /**
    * Update an iuran record
-   * @param id - Iuran ID
-   * @param updateIuranDto - Updated iuran data
    */
   @Put(':id')
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR, UserRole.ADMIN)
-  @Throttle('medium')
+  @Throttle(100, 60000)
   @ApiOperation({ summary: 'Update an iuran record (Super Admin, Supervisor, Admin)' })
   @ApiParam({ name: 'id', type: String })
   async update(
@@ -100,46 +120,13 @@ export class IuranController {
 
   /**
    * Delete an iuran record
-   * @param id - Iuran ID
    */
   @Delete(':id')
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR)
-  @Throttle('medium')
+  @Throttle(100, 60000)
   @ApiOperation({ summary: 'Delete an iuran record (Super Admin & Supervisor only)' })
   @ApiParam({ name: 'id', type: String })
   async remove(@Param('id') id: string, @Request() req) {
     return this.iuranService.remove(id, req.user);
-  }
-
-  /**
-   * Get iuran history for a user
-   * @param userId - User ID
-   */
-  @Get('user/:userId')
-  @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR, UserRole.ADMIN, UserRole.WARGA)
-  @Throttle('medium')
-  @ApiOperation({ summary: 'Get iuran history for a user' })
-  @ApiParam({ name: 'userId', type: String })
-  async findByUser(@Param('userId') userId: string, @Request() req) {
-    return this.iuranService.findByUser(userId);
-  }
-
-  /**
-   * Get iuran report (summary)
-   * @param tahun - Year (optional)
-   * @param bulan - Month (optional)
-   */
-  @Get('report')
-  @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR, UserRole.ADMIN)
-  @Throttle('medium')
-  @ApiOperation({ summary: 'Get iuran report (Super Admin, Supervisor, Admin)' })
-  @ApiQuery({ name: 'tahun', required: false, type: Number })
-  @ApiQuery({ name: 'bulan', required: false, type: Number })
-  async getReport(
-    @Query('tahun') tahun?: number,
-    @Query('bulan') bulan?: number,
-    @Request() req,
-  ) {
-    return this.iuranService.getReport(tahun, bulan);
   }
 }

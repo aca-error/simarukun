@@ -28,17 +28,7 @@ export class LoggerInterceptor implements NestInterceptor {
     const ip = request.ip || request.connection?.remoteAddress;
     const userAgent = request.headers['user-agent'];
 
-    // Log request
     const startTime = Date.now();
-    this.logger.logRequest(
-      request.method,
-      request.url,
-      null, // statusCode will be set later
-      null, // duration will be calculated later
-      userId,
-      ip,
-      userAgent,
-    );
 
     return next.handle().pipe(
       tap((data) => {

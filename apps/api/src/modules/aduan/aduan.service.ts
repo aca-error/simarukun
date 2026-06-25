@@ -9,6 +9,7 @@ import { Aduan } from './entities/aduan.entity';
 import { CreateAduanDto } from './dto/create-aduan.dto';
 import { UpdateAduanDto } from './dto/update-aduan.dto';
 import { User } from '../users/entities/user.entity';
+import { UserRole } from '../../common/enums/user-role.enum';
 
 export interface PaginatedResult<T> {
   data: T[];
@@ -121,7 +122,12 @@ export class AduanService {
     const aduan = await this.findOne(id);
 
     // Check if user has permission to update this aduan
-    if (aduan.userId !== currentUser.id && currentUser.role !== 'SUPERADMIN' && currentUser.role !== 'SUPERVISOR' && currentUser.role !== 'ADMIN') {
+    if (
+      aduan.userId !== currentUser.id &&
+      currentUser.role !== UserRole.SUPERADMIN &&
+      currentUser.role !== UserRole.SUPERVISOR &&
+      currentUser.role !== UserRole.ADMIN
+    ) {
       throw new ForbiddenException('You do not have permission to update this aduan');
     }
 
@@ -137,7 +143,11 @@ export class AduanService {
     const aduan = await this.findOne(id);
 
     // Check if user has permission to delete this aduan
-    if (aduan.userId !== currentUser.id && currentUser.role !== 'SUPERADMIN' && currentUser.role !== 'SUPERVISOR') {
+    if (
+      aduan.userId !== currentUser.id &&
+      currentUser.role !== UserRole.SUPERADMIN &&
+      currentUser.role !== UserRole.SUPERVISOR
+    ) {
       throw new ForbiddenException('You do not have permission to delete this aduan');
     }
 
@@ -167,7 +177,11 @@ export class AduanService {
     const aduan = await this.findOne(id);
 
     // Check if user has permission to update this aduan status
-    if (currentUser.role !== 'SUPERADMIN' && currentUser.role !== 'SUPERVISOR' && currentUser.role !== 'ADMIN') {
+    if (
+      currentUser.role !== UserRole.SUPERADMIN &&
+      currentUser.role !== UserRole.SUPERVISOR &&
+      currentUser.role !== UserRole.ADMIN
+    ) {
       throw new ForbiddenException('You do not have permission to update aduan status');
     }
 

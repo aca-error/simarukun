@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ZodValidationPipe } from 'nestjs-zod';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuditModule } from './modules/audit/audit.module';
@@ -15,11 +17,12 @@ import { WebhookModule } from './modules/webhook/webhook.module';
 import { ServerModule } from './modules/server/server.module';
 import { HealthModule } from './modules/health/health.module';
 import { LoggerModule } from './modules/logger/logger.module';
+import { LoggerInterceptor } from './modules/logger/logger.interceptor';
 import { MonitoringModule } from './modules/monitoring/monitoring.module';
+import { MetricsInterceptor } from './modules/monitoring/metrics.interceptor';
 
 @Module({
   imports: [
-    // Configuration
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: [
@@ -29,11 +32,10 @@ import { MonitoringModule } from './modules/monitoring/monitoring.module';
       ],
     }),
 
-    // Database
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT) || 5432,
+      port: parseInt(process.env.DB_PORT || '5432', 10),
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
@@ -43,32 +45,17 @@ import { MonitoringModule } from './modules/monitoring/monitoring.module';
       migrationsRun: true,
       ssl: process.env.NODE_ENV === 'production',
       extra: {
-        max: 20, // Connection pool size
+        max: 20,
         connectionTimeoutMillis: 5000,
         idleTimeoutMillis: 10000,
       },
     }),
 
-    // Rate Limiting (PHASE 1 - Task 2)
-    ThrottlerModule.forRoot([
-      {
-        name: 'short',
-        ttl: 1000, // 1 detik
-        limit: 5, // 5 request per detik
-      },
-      {
-        name: 'medium',
-        ttl: 60000, // 1 menit
-        limit: 100, // 100 request per menit
-      },
-      {
-        name: 'long',
-        ttl: 3600000, // 1 jam
-        limit: 1000, // 1000 request per jam
-      },
-    ]),
+    ThrottlerModule.forRoot({
+      ttl: 60000,
+      limit: 100,
+    }),
 
-    // Feature Modules
     AuditModule,
     AuthModule,
     UsersModule,
@@ -83,6 +70,24 @@ import { MonitoringModule } from './modules/monitoring/monitoring.module';
     MonitoringModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_PIPE,
+      useClass: ZodValidationPipe,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggerInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: MetricsInterceptor,
+    },
+  ],
 })
 export class AppModule {}

@@ -62,14 +62,17 @@ export class SentryService implements OnModuleInit {
     level: 'debug' | 'info' | 'warning' | 'error' | 'fatal' = 'error',
     context?: Record<string, any>,
   ) {
-    Sentry.captureMessage(message, this.mapSeverity(level), context);
+    Sentry.captureMessage(message, {
+      level: this.mapSeverity(level),
+      ...(context ? { extra: context } : {}),
+    });
   }
 
   /**
-   * Start a transaction
+   * Start a transaction (Sentry v7 compatibility)
    */
-  startTransaction(name: string, options?: Sentry.TransactionOptions) {
-    return Sentry.startTransaction(name, options);
+  startTransaction(name: string, options?: Record<string, unknown>) {
+    return Sentry.startTransaction({ name, ...options });
   }
 
   /**

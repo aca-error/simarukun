@@ -9,6 +9,7 @@ import {
   Query,
   UseGuards,
   Request,
+  NotFoundException,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { UsersService } from './users.service';
@@ -29,14 +30,10 @@ export class UsersController {
 
   /**
    * Get all users (with pagination)
-   * @param page - Page number (default: 1)
-   * @param limit - Items per page (default: 10)
-   * @param role - Filter by role (optional)
-   * @param isActive - Filter by active status (optional)
    */
   @Get()
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR)
-  @Throttle('medium') // Rate limiting: 100 requests per minute
+  @Throttle(100, 60000)
   @ApiOperation({ summary: 'Get all users (Super Admin & Supervisor only)' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
@@ -53,38 +50,62 @@ export class UsersController {
   }
 
   /**
+   * Search users by name or email
+   */
+  @Get('search')
+  @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR)
+  @Throttle(100, 60000)
+  @ApiOperation({ summary: 'Search users (Super Admin & Supervisor only)' })
+  @ApiQuery({ name: 'q', required: true, type: String })
+  async search(@Query('q') query: string, @Request() req) {
+    return this.usersService.search(query);
+  }
+
+  /**
    * Get user by ID
-   * @param id - User ID
    */
   @Get(':id')
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR, UserRole.ADMIN)
-  @Throttle('medium')
+  @Throttle(100, 60000)
   @ApiOperation({ summary: 'Get user by ID (Super Admin, Supervisor, Admin)' })
   @ApiParam({ name: 'id', type: String })
   async findOne(@Param('id') id: string, @Request() req) {
-    return this.usersService.findOne(id);
+    const user = await this.usersService.findById(id);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 
   /**
    * Create a new user
-   * @param createUserDto - User data
    */
   @Post()
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR)
-  @Throttle('medium')
+  @Throttle(100, 60000)
   @ApiOperation({ summary: 'Create a new user (Super Admin & Supervisor only)' })
   async create(@Body() createUserDto: CreateUserDto, @Request() req) {
     return this.usersService.create(createUserDto);
   }
 
   /**
+   * Toggle user active status
+   */
+  @Put(':id/toggle-active')
+  @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR)
+  @Throttle(100, 60000)
+  @ApiOperation({ summary: 'Toggle user active status (Super Admin & Supervisor only)' })
+  @ApiParam({ name: 'id', type: String })
+  async toggleActive(@Param('id') id: string, @Request() req) {
+    return this.usersService.toggleActive(id);
+  }
+
+  /**
    * Update a user
-   * @param id - User ID
-   * @param updateUserDto - Updated user data
    */
   @Put(':id')
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR)
-  @Throttle('medium')
+  @Throttle(100, 60000)
   @ApiOperation({ summary: 'Update a user (Super Admin & Supervisor only)' })
   @ApiParam({ name: 'id', type: String })
   async update(
@@ -97,40 +118,13 @@ export class UsersController {
 
   /**
    * Delete a user
-   * @param id - User ID
    */
   @Delete(':id')
   @Roles(UserRole.SUPERADMIN)
-  @Throttle('medium')
+  @Throttle(100, 60000)
   @ApiOperation({ summary: 'Delete a user (Super Admin only)' })
   @ApiParam({ name: 'id', type: String })
   async remove(@Param('id') id: string, @Request() req) {
     return this.usersService.remove(id);
-  }
-
-  /**
-   * Toggle user active status
-   * @param id - User ID
-   */
-  @Put(':id/toggle-active')
-  @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR)
-  @Throttle('medium')
-  @ApiOperation({ summary: 'Toggle user active status (Super Admin & Supervisor only)' })
-  @ApiParam({ name: 'id', type: String })
-  async toggleActive(@Param('id') id: string, @Request() req) {
-    return this.usersService.toggleActive(id);
-  }
-
-  /**
-   * Search users by name or email
-   * @param query - Search query
-   */
-  @Get('search')
-  @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR)
-  @Throttle('medium')
-  @ApiOperation({ summary: 'Search users (Super Admin & Supervisor only)' })
-  @ApiQuery({ name: 'q', required: true, type: String })
-  async search(@Query('q') query: string, @Request() req) {
-    return this.usersService.search(query);
   }
 }
