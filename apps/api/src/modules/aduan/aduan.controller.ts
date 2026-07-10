@@ -11,8 +11,14 @@ import {
   Request,
   UploadedFile,
   UseInterceptors,
+  ForbiddenException,
+  BadRequestException,
+  PayloadTooLargeException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname, join } from 'path';
+import { v4 as uuid } from 'uuid';
 import { Throttle } from '@nestjs/throttler';
 import { AduanService } from './aduan.service';
 import { CreateAduanDto } from './dto/create-aduan.dto';
@@ -71,6 +77,10 @@ export class AduanController {
   @ApiOperation({ summary: 'Get aduan by user' })
   @ApiParam({ name: 'userId', type: String })
   async findByUser(@Param('userId') userId: string, @Request() req) {
+    // Warga only allowed to see their own aduan
+    if (req.user.role === UserRole.WARGA && req.user.id !== userId) {
+      throw new ForbiddenException('Anda hanya dapat melihat aduan sendiri');
+    }
     return this.aduanService.findByUser(userId);
   }
 
@@ -83,7 +93,12 @@ export class AduanController {
   @ApiOperation({ summary: 'Get aduan by ID' })
   @ApiParam({ name: 'id', type: String })
   async findOne(@Param('id') id: string, @Request() req) {
-    return this.aduanService.findOne(id);
+    const aduan = await this.aduanService.findOne(id);
+    // Warga only allowed to see their own aduan
+    if (req.user.role === UserRole.WARGA && aduan.userId !== req.user.id) {
+      throw new ForbiddenException('Anda hanya dapat melihat aduan sendiri');
+    }
+    return aduan;
   }
 
   /**
@@ -94,7 +109,26 @@ export class AduanController {
   @Throttle(100, 60000)
   @ApiOperation({ summary: 'Create a new aduan' })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+      fileFilter: (_req, file, cb) => {
+        const allowedMimes = ['image/jpeg', 'image/png', 'application/pdf'];
+        if (!allowedMimes.includes(file.mimetype)) {
+          cb(new BadRequestException('Format file tidak didukung. Gunakan JPG, PNG, atau PDF'), false);
+          return;
+        }
+        cb(null, true);
+      },
+      storage: diskStorage({
+        destination: join(process.cwd(), 'uploads'),
+        filename: (_req, file, cb) => {
+          const ext = extname(file.originalname);
+          cb(null, `${uuid()}${ext}`);
+        },
+      }),
+    }),
+  )
   async create(
     @Body() createAduanDto: CreateAduanDto,
     @Request() req,

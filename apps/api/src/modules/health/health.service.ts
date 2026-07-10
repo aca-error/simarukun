@@ -61,7 +61,10 @@ export class HealthService {
       checks.database = {
         status: 'error',
         message: error.message,
-        details: { error: error.stack },
+        details:
+          process.env.NODE_ENV === 'production'
+            ? { error: 'Database connection failed' }
+            : { error: error.stack },
       };
     }
 
@@ -149,7 +152,10 @@ export class HealthService {
           database: {
             status: 'error',
             message: error.message,
-            details: { error: error.stack },
+            details:
+              process.env.NODE_ENV === 'production'
+                ? { error: 'Database connection failed' }
+                : { error: error.stack },
           },
         },
       };

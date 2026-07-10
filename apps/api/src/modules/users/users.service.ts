@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, FindOptionsWhere } from 'typeorm';
+import * as argon2 from '@node-rs/argon2';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -106,7 +107,11 @@ export class UsersService {
       throw new ConflictException('Email already exists');
     }
 
-    const user = this.usersRepository.create(createUserDto);
+    const hashedPassword = await argon2.hash(createUserDto.password);
+    const user = this.usersRepository.create({
+      ...createUserDto,
+      password: hashedPassword,
+    });
     const savedUser = await this.usersRepository.save(user);
 
     const { password, ...userWithoutPassword } = savedUser;
@@ -135,6 +140,11 @@ export class UsersService {
       if (existingUser && existingUser.id !== id) {
         throw new ConflictException('Email already exists');
       }
+    }
+
+    // Hash password if provided
+    if (updateUserDto.password) {
+      updateUserDto.password = await argon2.hash(updateUserDto.password);
     }
 
     const updatedUser = this.usersRepository.merge(user, updateUserDto);
@@ -203,12 +213,13 @@ export class UsersService {
   }
 
   /**
-   * Update user's refresh token
+   * Update user's refresh token (hashed)
    * @param userId - User ID
    * @param refreshToken - Refresh token
    */
   async updateRefreshToken(userId: string, refreshToken: string): Promise<void> {
-    await this.usersRepository.update(userId, { refreshToken });
+    const hashedToken = await argon2.hash(refreshToken);
+    await this.usersRepository.update(userId, { refreshToken: hashedToken });
   }
 
   /**

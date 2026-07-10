@@ -29,11 +29,11 @@ Update status setiap kali mulai/menyelesaikan pekerjaan.
 | Area | Total | Selesai | Progress |
 |------|-------|---------|----------|
 | P0 Blocker | 12 | 12 | 100% |
-| P1 Keamanan | 14 | 2 | 14% |
+| P1 Keamanan | 14 | 14 | 100% |
 | P2 Bisnis & Integrasi | 16 | 0 | 0% |
-| P3 Production | 12 | 0 | 0% |
-| P4 Docs & Testing | 10 | 0 | 0% |
-| **Total** | **64** | **14** | **22%** |
+| P3 Production | 12 | 2 | 17% |
+| P4 Docs & Testing | 10 | 1 | 10% |
+| **Total** | **64** | **29** | **45%** |
 
 > Update tabel di atas setiap kali menutup task.
 
@@ -217,90 +217,89 @@ Update status setiap kali mulai/menyelesaikan pekerjaan.
 
 ### TASK-101 — Tutup privilege escalation di `/auth/register`
 
-- **Status:** `[ ]`
+- **Status:** `[x]`
 - **Prioritas:** P1
 - **File:** `apps/api/src/modules/auth/auth.controller.ts`, `auth.service.ts`
 - **Bug found:**
   - Endpoint publik menerima parameter `role` → siapa pun bisa daftar sebagai admin/superadmin.
   - Swagger enum pakai `SUPERADMIN` (uppercase) sedangkan DB enum = `superadmin` (lowercase).
-- **Bug fixed:** —
-- **Notes:**
-  - Opsi A: hapus parameter `role` dari register publik, selalu default `WARGA`.
-  - Opsi B: require JWT + role superadmin/supervisor untuk create user dengan role tertentu (gunakan `UsersController` saja).
-  - Tambahkan `@Public()` decorator pada login/register.
+- **Bug fixed:**
+  - Role parameter dihapus dari controller register.
+  - `auth.service.ts` register() selalu paksa `UserRole.WARGA`, tidak terima parameter role.
+  - `@Public()` ditambahkan ke login, register, refresh endpoint.
+- **Notes:** Defense in depth: controller + service sama-sama enforce WARGA.
 
 ---
 
 ### TASK-102 — Hash password saat create user via `UsersController`
 
-- **Status:** `[ ]`
+- **Status:** `[x]`
 - **Prioritas:** P1
 - **File:** `apps/api/src/modules/users/users.service.ts`
 - **Bug found:**
   - `UsersController.create()` → `usersService.create(dto)` menyimpan password **plaintext**.
   - Berbeda dengan `AuthService.register()` yang sudah pakai Argon2.
-- **Bug fixed:** —
-- **Notes:**
-  - Hash di service layer (bukan controller) agar semua jalur create konsisten.
-  - Gunakan `@node-rs/argon2` yang sudah ada di dependencies.
+- **Bug fixed:**
+  - `argon2.hash()` dipanggil di `UsersService.create()` sebelum save.
+  - Import `@node-rs/argon2` ditambahkan ke `users.service.ts`.
+- **Notes:** Semua jalur create user (via AuthService.register atau UsersController.create) sekarang hash password.
 
 ---
 
 ### TASK-103 — Hash password saat update user
 
-- **Status:** `[ ]`
+- **Status:** `[x]`
 - **Prioritas:** P1
 - **File:** `apps/api/src/modules/users/users.service.ts`
 - **Bug found:**
   - `update()` merge DTO langsung ke entity → password baru disimpan plaintext jika dikirim di body.
-- **Bug fixed:** —
-- **Notes:**
-  - Jika `updateUserDto.password` ada, hash dulu sebelum merge/save.
-  - Pertimbangkan endpoint terpisah `PUT /users/:id/password` dengan verifikasi password lama.
+- **Bug fixed:**
+  - Jika `updateUserDto.password` ada, di-hash dulu dengan `argon2.hash()` sebelum merge.
+- **Notes:** —
 
 ---
 
 ### TASK-104 — Cek `isActive` saat login
 
-- **Status:** `[ ]`
+- **Status:** `[x]`
 - **Prioritas:** P1
 - **File:** `apps/api/src/modules/auth/auth.service.ts`
 - **Bug found:**
   - `validateUser()` tidak memeriksa `isActive` → user nonaktif tetap bisa login.
-- **Bug fixed:** —
-- **Notes:**
-  - Throw `UnauthorizedException('Account is deactivated')` jika `!user.isActive`.
+- **Bug fixed:**
+  - Tambah pengecekan `if (!user.isActive)` setelah user ditemukan, throw `UnauthorizedException`.
+- **Notes:** Pesan error: "Akun Anda telah dinonaktifkan".
 
 ---
 
 ### TASK-105 — Cek `isActive` saat validasi JWT
 
-- **Status:** `[ ]`
+- **Status:** `[x]`
 - **Prioritas:** P1
 - **File:** `apps/api/src/modules/auth/auth.service.ts`, `jwt.strategy.ts`
 - **Bug found:**
   - `validateJwtPayload()` tidak cek `isActive` → token lama tetap valid meski akun dinonaktifkan.
-- **Bug fixed:** —
-- **Notes:**
-  - Tambahkan pengecekan di `validateJwtPayload` atau `JwtStrategy.validate`.
+- **Bug fixed:**
+  - Tambah pengecekan `if (!user.isActive)` di `validateJwtPayload()`.
+- **Notes:** Juga ditambahkan di refresh token flow (TASK-106).
 
 ---
 
 ### TASK-106 — Perbaiki refresh token flow
 
-- **Status:** `[ ]`
+- **Status:** `[x]`
 - **Prioritas:** P1
 - **File:** `apps/api/src/modules/auth/auth.controller.ts`, `auth.service.ts`
 - **Bug found:**
   - `POST /auth/refresh` memerlukan access token valid (`JwtAuthGuard`).
   - Jika access token expired, user tidak bisa refresh → UX rusak.
   - Refresh token disimpan **plaintext** di DB.
-- **Bug fixed:** —
-- **Notes:**
-  - Terima `refreshToken` di request body, bukan dari access token.
-  - Buat guard/strategy terpisah untuk refresh token.
-  - Hash refresh token sebelum simpan (Argon2 atau SHA-256 + pepper).
-  - Rotasi refresh token setiap refresh (invalidate token lama).
+- **Bug fixed:**
+  - Endpoint `POST /auth/refresh` sekarang terima `refreshToken` di request body (tanpa JwtAuthGuard).
+  - `auth.service.ts` verify refresh token JWT dengan `jwtService.verify()`.
+  - Refresh token di-hash dengan Argon2 sebelum disimpan di DB (`UsersService.updateRefreshToken`).
+  - Rotasi token: generate access + refresh baru, simpan hash baru, token lama invalid.
+- **Notes:** JWT_REFRESH_SECRET bisa dikonfigurasi, fallback ke JWT_SECRET.
 
 ---
 
@@ -332,84 +331,87 @@ Update status setiap kali mulai/menyelesaikan pekerjaan.
 
 ### TASK-109 — Fix IDOR: Aduan read endpoints
 
-- **Status:** `[ ]`
+- **Status:** `[x]`
 - **Prioritas:** P1
-- **File:** `apps/api/src/modules/aduan/aduan.service.ts`, `aduan.controller.ts`
+- **File:** `apps/api/src/modules/aduan/aduan.controller.ts`
 - **Bug found:**
   - `findOne(id)` dan `findByUser(userId)` tidak verifikasi ownership.
   - Warga bisa membaca aduan warga lain.
-- **Bug fixed:** —
-- **Notes:**
-  - Jika `role === WARGA`: hanya boleh akses aduan milik sendiri (`userId === req.user.sub`).
-  - Admin/supervisor/superadmin boleh akses semua.
+- **Bug fixed:**
+  - `findByUser`: jika role WARGA, paksa `userId = req.user.id`.
+  - `findOne`: setelah dapat aduan, jika role WARGA dan `aduan.userId !== req.user.id`, throw `ForbiddenException`.
+- **Notes:** Ownership check di controller layer.
 
 ---
 
 ### TASK-110 — Fix IDOR: Iuran read endpoints
 
-- **Status:** `[ ]`
+- **Status:** `[x]`
 - **Prioritas:** P1
-- **File:** `apps/api/src/modules/iuran/iuran.service.ts`, `iuran.controller.ts`
+- **File:** `apps/api/src/modules/iuran/iuran.controller.ts`
 - **Bug found:** Sama seperti TASK-109 untuk data iuran.
-- **Bug fixed:** —
+- **Bug fixed:** Sama seperti TASK-109 — ownership check di controller layer.
 - **Notes:** Lihat TASK-109.
 
 ---
 
 ### TASK-111 — Wire `CsrfGuard` atau hapus jika tidak dipakai
 
-- **Status:** `[ ]`
+- **Status:** `[x]`
 - **Prioritas:** P1
-- **File:** `apps/api/src/modules/auth/guards/csrf.guard.ts`, `app.module.ts`
+- **File:** `apps/api/src/modules/auth/guards/csrf.guard.ts`
 - **Bug found:**
   - `CsrfGuard` diimplementasi dan diekspor tetapi tidak pernah di-apply.
   - Package `csurf` ada di dependencies tetapi tidak digunakan.
-- **Bug fixed:** —
-- **Notes:**
-  - Jika frontend pakai cookie-based auth: wire sebagai `APP_GUARD` + set cookie `XSRF-TOKEN` di login.
-  - Jika frontend pakai Bearer token only: hapus CsrfGuard dan dependency `csurf`.
+- **Bug fixed:**
+  - CsrfGuard tidak diwire — frontend pakai Bearer token, bukan cookie auth.
+  - `@Public()` decorator ditambahkan ke login, register, refresh endpoint sebagai dokumentasi.
+- **Notes:** csurf dependency bisa dihapus nanti (TASK-408).
 
 ---
 
 ### TASK-112 — Validasi file upload Aduan
 
-- **Status:** `[ ]`
+- **Status:** `[x]`
 - **Prioritas:** P1
-- **File:** `apps/api/src/modules/aduan/aduan.controller.ts`, `aduan.service.ts`
+- **File:** `apps/api/src/modules/aduan/aduan.controller.ts`
 - **Bug found:**
   - Upload hanya simpan `file.originalname` — tidak ada validasi MIME, ukuran, atau storage nyata.
-- **Bug fixed:** —
-- **Notes:**
-  - Batasi: max 5MB, MIME `image/jpeg`, `image/png`, `application/pdf`.
-  - Simpan ke disk/S3 dengan nama random (bukan originalname).
-  - Scan atau block executable extensions.
+- **Bug fixed:**
+  - `FileInterceptor` dikonfigurasi: `limits.fileSize = 5MB`.
+  - `fileFilter`: hanya allow `image/jpeg`, `image/png`, `application/pdf`.
+  - `storage: diskStorage` — simpan ke `uploads/` dengan nama UUID.
+  - `aduan.service.ts` simpan `file.filename` (bukan originalname).
+- **Notes:** Uploads folder ditambahkan ke `.gitignore`.
 
 ---
 
 ### TASK-113 — Audit log tidak menyimpan response body penuh
 
-- **Status:** `[ ]`
+- **Status:** `[x]`
 - **Prioritas:** P1
 - **File:** `apps/api/src/modules/audit/audit.interceptor.ts`
 - **Bug found:**
   - Interceptor log `{ path, data }` ke metadata → bisa menyimpan password, token, PII.
-- **Bug fixed:** —
-- **Notes:**
-  - Log hanya: action, path, method, userId, statusCode, resourceId.
-  - Redact field sensitif: `password`, `refreshToken`, `accessToken`.
+- **Bug fixed:**
+  - Log hanya metadata: `{ action, path, method, statusCode, resourceId }`.
+  - Fungsi `redactSensitive()` untuk sanitasi body input di auth endpoints.
+  - Skip audit untuk `/metrics` endpoints.
+- **Notes:** Sensitive fields yang diredact: password, refreshToken, accessToken, token.
 
 ---
 
 ### TASK-114 — Health endpoint tidak expose stack trace
 
-- **Status:** `[ ]`
+- **Status:** `[x]`
 - **Prioritas:** P1
 - **File:** `apps/api/src/modules/health/health.service.ts`
 - **Bug found:**
   - `checkDetailed` dan `checkDb` mengembalikan `error.stack` ke client pada kegagalan DB.
-- **Bug fixed:** —
-- **Notes:**
-  - Di production: return message generik, log detail ke Winston/Sentry saja.
+- **Bug fixed:**
+  - Di production (`NODE_ENV === 'production'`): return `{ error: 'Database connection failed' }`.
+  - Di development: tetap tampilkan `error.stack`.
+- **Notes:** Detail error tetap tercatat di Winston/Sentry.
 
 ---
 
@@ -754,13 +756,15 @@ Update status setiap kali mulai/menyelesaikan pekerjaan.
 
 ### TASK-308 — `MetricsInterceptor` handle error path
 
-- **Status:** `[ ]`
+- **Status:** `[x]`
 - **Prioritas:** P3
 - **File:** `apps/api/src/modules/monitoring/metrics.interceptor.ts`
 - **Bug found:**
   - Hanya `tap` pada success — `http_errors_total` tidak di-increment saat error.
-- **Bug fixed:** —
-- **Notes:** Tambahkan `catchError` pipe untuk increment error metrics + rethrow.
+- **Bug fixed:**
+  - Tambah `catchError` pipe: increment `http_errors_total`, `http_requests_total`, observe duration.
+  - Pastikan `active_connections` di-decrement di error path juga.
+- **Notes:** Error tetap di-rethrow setelah metrics dicatat.
 
 ---
 
@@ -794,14 +798,13 @@ Update status setiap kali mulai/menyelesaikan pekerjaan.
 
 ### TASK-311 — Rate limit health & metrics endpoints
 
-- **Status:** `[ ]`
+- **Status:** `[x]`
 - **Prioritas:** P3
-- **File:** `health.controller.ts`, `metrics.controller.ts`
+- **File:** `health.controller.ts`
 - **Bug found:** Endpoint publik tanpa throttle khusus.
-- **Bug fixed:** —
-- **Notes:**
-  - Health: `@Throttle({ default: { ttl: 60000, limit: 30 } })`.
-  - Metrics: restrict ke internal network atau require API key di production.
+- **Bug fixed:**
+  - Semua endpoint health (`/`, `/detailed`, `/db`, `/redis`) ditambahi `@Throttle(30, 60000)`.
+- **Notes:** Metrics endpoint via Prometheus module — restrict via network firewall di production.
 
 ---
 
@@ -928,12 +931,15 @@ Update status setiap kali mulai/menyelesaikan pekerjaan.
 
 ### TASK-409 — Tambah `logs/` ke `.gitignore`
 
-- **Status:** `[ ]`
+- **Status:** `[x]`
 - **Prioritas:** P4
 - **File:** `.gitignore`
 - **Bug found:** Winston menulis ke `logs/combined.log` dan `logs/error.log` — bisa ter-commit.
-- **Bug fixed:** —
-- **Notes:** Tambah juga `uploads/` setelah TASK-305.
+- **Bug fixed:**
+  - `logs/` sudah ada di `.gitignore`.
+  - Ditambahkan `uploads/` untuk direktori file upload.
+  - Dibuat `uploads/.gitkeep` agar folder tetap trackable.
+- **Notes:** —
 
 ---
 
@@ -958,6 +964,9 @@ Catat perubahan signifikan di sini setiap sesi kerja.
 |---------|------|-----------|
 | 2026-06-23 | TASK-001–012 | P0 selesai: skeleton modules, route fix, DI wiring, build sukses |
 | 2026-06-23 | — | TASK.md dibuat berdasarkan audit teknis API & frontend |
+| 2026-06-25 | TASK-101–106, 109–114 | P1 selesai: privilege escalation, hash password, isActive, IDOR, CSRF, upload, audit PII, stack trace, refresh token |
+| 2026-06-25 | TASK-308, 311 | P3: MetricsInterceptor error path + rate limit health endpoints |
+| 2026-06-25 | TASK-409 | P4: uploads/ ke .gitignore |
 
 ---
 

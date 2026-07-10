@@ -13,6 +13,7 @@ import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { LoginResponse } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { Public } from './decorators/public.decorator';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiBody, ApiResponse } from '@nestjs/swagger';
 
 @ApiTags('Authentication')
@@ -24,6 +25,7 @@ export class AuthController {
    * Login user
    */
   @Post('login')
+  @Public()
   @Throttle(5, 1000)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login user' })
@@ -50,6 +52,7 @@ export class AuthController {
    * Register new user
    */
   @Post('register')
+  @Public()
   @Throttle(5, 1000)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Register new user' })
@@ -60,7 +63,6 @@ export class AuthController {
         nama: { type: 'string', minLength: 2, maxLength: 100 },
         email: { type: 'string', format: 'email' },
         password: { type: 'string', minLength: 8 },
-        role: { type: 'string', enum: ['SUPERADMIN', 'SUPERVISOR', 'ADMIN', 'WARGA'] },
       },
       required: ['nama', 'email', 'password'],
     },
@@ -71,24 +73,33 @@ export class AuthController {
     @Body('nama') nama: string,
     @Body('email') email: string,
     @Body('password') password: string,
-    @Body('role') role?: string,
   ): Promise<LoginResponse> {
-    return this.authService.register(nama, email, password, role as any);
+    return this.authService.register(nama, email, password);
   }
 
   /**
    * Refresh access token
    */
   @Post('refresh')
-  @Throttle(100, 60000)
+  @Public()
+  @Throttle(5, 1000)
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Refresh access token' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        refreshToken: { type: 'string' },
+      },
+      required: ['refreshToken'],
+    },
+  })
   @ApiResponse({ status: 200, description: 'Token refreshed successfully' })
   @ApiResponse({ status: 401, description: 'Invalid refresh token' })
-  async refreshToken(@Request() req): Promise<{ accessToken: string }> {
-    return this.authService.refreshToken(req.user.sub, req.user.refreshToken);
+  async refreshToken(
+    @Body('refreshToken') refreshToken: string,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    return this.authService.refreshToken(refreshToken);
   }
 
   /**

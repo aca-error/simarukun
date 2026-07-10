@@ -9,6 +9,7 @@ import {
   Query,
   UseGuards,
   Request,
+  ForbiddenException,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { IuranService } from './iuran.service';
@@ -76,6 +77,10 @@ export class IuranController {
   @ApiOperation({ summary: 'Get iuran history for a user' })
   @ApiParam({ name: 'userId', type: String })
   async findByUser(@Param('userId') userId: string, @Request() req) {
+    // Warga only allowed to see their own iuran
+    if (req.user.role === UserRole.WARGA && req.user.id !== userId) {
+      throw new ForbiddenException('Anda hanya dapat melihat iuran sendiri');
+    }
     return this.iuranService.findByUser(userId);
   }
 
@@ -88,7 +93,12 @@ export class IuranController {
   @ApiOperation({ summary: 'Get iuran by ID' })
   @ApiParam({ name: 'id', type: String })
   async findOne(@Param('id') id: string, @Request() req) {
-    return this.iuranService.findOne(id);
+    const iuran = await this.iuranService.findOne(id);
+    // Warga only allowed to see their own iuran
+    if (req.user.role === UserRole.WARGA && iuran.userId !== req.user.id) {
+      throw new ForbiddenException('Anda hanya dapat melihat iuran sendiri');
+    }
+    return iuran;
   }
 
   /**

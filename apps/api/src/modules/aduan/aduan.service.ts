@@ -96,9 +96,7 @@ export class AduanService {
     let lampiran: string | null = null;
 
     if (file) {
-      // In production, you would upload the file to a storage service
-      // For now, we'll just store the filename
-      lampiran = file.originalname;
+      lampiran = file.filename || file.originalname;
     }
 
     const aduan = this.aduanRepository.create({

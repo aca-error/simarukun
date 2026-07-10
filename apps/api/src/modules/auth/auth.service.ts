@@ -55,6 +55,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    if (!user.isActive) {
+      throw new UnauthorizedException('Akun Anda telah dinonaktifkan');
+    }
+
     const isPasswordValid = await argon2.verify(user.password, password);
 
     if (!isPasswordValid) {
@@ -106,7 +110,6 @@ export class AuthService {
     nama: string,
     email: string,
     password: string,
-    role: UserRole = UserRole.WARGA,
   ): Promise<LoginResponse> {
     // Check if email already exists
     const existingUser = await this.usersService.findByEmail(email);
@@ -117,12 +120,12 @@ export class AuthService {
     // Hash password
     const hashedPassword = await argon2.hash(password);
 
-    // Create user
+    // Create user — always WARGA, role cannot be set via public register
     const user = await this.usersService.create({
       nama,
       email,
       password: hashedPassword,
-      role,
+      role: UserRole.WARGA,
     });
 
     const tokens = await this.generateTokens(user.id, user.email, user.role);
@@ -178,30 +181,42 @@ export class AuthService {
 
   /**
    * Refresh access token
-   * @param userId - User ID
    * @param refreshToken - Current refresh token
-   * @returns New access token
+   * @returns New access and refresh tokens
    */
-  async refreshToken(userId: string, refreshToken: string): Promise<{ accessToken: string }> {
-    const user = await this.usersService.findById(userId);
+  async refreshToken(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
+    let payload: JwtPayload;
+    try {
+      payload = this.jwtService.verify<JwtPayload>(refreshToken, {
+        secret: this.configService.get<string>('JWT_REFRESH_SECRET') || this.configService.get<string>('JWT_SECRET'),
+      });
+    } catch {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
 
-    if (!user || user.refreshToken !== refreshToken) {
+    const user = await this.usersService.findById(payload.sub);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    if (!user.isActive) {
+      throw new UnauthorizedException('Akun Anda telah dinonaktifkan');
+    }
+
+    if (!user.refreshToken) {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    const payload: JwtPayload = {
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-    };
+    const isTokenValid = await argon2.verify(user.refreshToken, refreshToken);
+    if (!isTokenValid) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
 
-    const accessToken = this.jwtService.sign(payload, {
-      expiresIn: this.configService.get<string>('JWT_EXPIRES_IN') || '15m',
-    });
+    // Rotate tokens: generate new pair
+    const tokens = await this.generateTokens(user.id, user.email, user.role);
+    await this.usersService.updateRefreshToken(user.id, tokens.refreshToken);
 
-    return {
-      accessToken,
-    };
+    return tokens;
   }
 
   /**
@@ -222,6 +237,10 @@ export class AuthService {
 
     if (!user) {
       throw new UnauthorizedException('User not found');
+    }
+
+    if (!user.isActive) {
+      throw new UnauthorizedException('Akun Anda telah dinonaktifkan');
     }
 
     return user;
