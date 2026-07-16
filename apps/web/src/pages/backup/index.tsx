@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Database, Clock, CheckCircle, XCircle, RefreshCw, Download, Upload } from 'lucide-react';
 import Layout from '@/components/Layout';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthStore } from '@/stores/authStore';
 
 // Dummy data for backup
 const backupData = [
@@ -15,7 +15,7 @@ const backupData = [
 
 export default function Backup() {
   const router = useRouter();
-  const { user, hasAccess, getRoleDescription } = useAuth();
+  const { user, hasAccess, getRoleDescription } = useAuthStore();
 
   useEffect(() => {
     if (!user || !hasAccess('/backup')) {

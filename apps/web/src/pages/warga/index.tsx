@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Search, Plus, Edit, Trash2 } from 'lucide-react';
 import Layout from '@/components/Layout';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthStore } from '@/stores/authStore';
 
 const wargaData = [
   { id: 1, nama: 'Bapak Joko', alamat: 'RT 01 RW 03', status: 'Aktif', iuran: 'Lunas' },
@@ -14,7 +14,7 @@ const wargaData = [
 
 export default function Warga() {
   const router = useRouter();
-  const { user, hasAccess } = useAuth();
+  const { user, hasAccess } = useAuthStore();
 
   useEffect(() => {
     if (!user || !hasAccess('/warga')) {

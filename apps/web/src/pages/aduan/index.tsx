@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Search, Plus, AlertCircle, Clock, CheckCircle } from 'lucide-react';
 import Layout from '@/components/Layout';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthStore } from '@/stores/authStore';
 
 const aduanData = [
   { id: 1, judul: 'Jalan Rusak', deskripsi: 'Jalan di depan rumah rusak parah.', status: 'Belum Ditangani', tanggal: '15 Jun 2026' },
@@ -14,7 +14,7 @@ const aduanData = [
 
 export default function Aduan() {
   const router = useRouter();
-  const { user, hasAccess } = useAuth();
+  const { user, hasAccess } = useAuthStore();
 
   useEffect(() => {
     if (!user || !hasAccess('/aduan')) {

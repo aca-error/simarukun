@@ -7,11 +7,11 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthStore } from '@/stores/authStore';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuthStore();
 
   // Menu berdasarkan role (4 roles: superadmin, supervisor, admin, warga)
   // REVISED: laporan for superadmin, supervisor, admin

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Webhook, CheckCircle, XCircle, RefreshCw, Code, Bell, Clock } from 'lucide-react';
 import Layout from '@/components/Layout';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthStore } from '@/stores/authStore';
 
 // Dummy data for webhook
 const webhookData = [
@@ -15,7 +15,7 @@ const webhookData = [
 
 export default function Webhook() {
   const router = useRouter();
-  const { user, hasAccess, getRoleDescription } = useAuth();
+  const { user, hasAccess, getRoleDescription } = useAuthStore();
 
   useEffect(() => {
     if (!user || !hasAccess('/webhook')) {

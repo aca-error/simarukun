@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthStore } from '@/stores/authStore';
 import Layout from '@/components/Layout';
 import { 
   TrendingUp, Users, FileText, AlertCircle, 
@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 
 export default function Home() {
-  const { user, getRoleDescription } = useAuth();
+  const { user, getRoleDescription } = useAuthStore();
 
   // Stats berdasarkan role
   const getStats = () => {
