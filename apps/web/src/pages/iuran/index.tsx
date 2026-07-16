@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Search, Plus, Calendar, DollarSign } from 'lucide-react';
 import Layout from '@/components/Layout';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthStore } from '@/stores/authStore';
 
 const iuranData = [
   { id: 1, bulan: 'Januari 2026', jumlah: 'Rp 50.000', status: 'Lunas', tanggal: '15 Jan 2026' },
@@ -14,7 +14,7 @@ const iuranData = [
 
 export default function Iuran() {
   const router = useRouter();
-  const { user, hasAccess } = useAuth();
+  const { user, hasAccess } = useAuthStore();
 
   useEffect(() => {
     if (!user || !hasAccess('/iuran')) {

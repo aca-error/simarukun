@@ -166,10 +166,13 @@ simarukun/
 │       ├── src/
 │       │   ├── components/           # Komponen reusable
 │       │   │   └── Layout.tsx         # Layout dengan navigasi berbasis role
-│       │   ├── contexts/              # Context API (Auth)
-│       │   │   └── AuthContext.tsx    # Context untuk autentikasi
 │       │   ├── lib/                   # Helper functions
-│       │   │   └── auth.ts            # Helper autentikasi
+│       │   │   ├── api.ts             # API client
+│       │   │   ├── csrf.ts            # CSRF protection
+│       │   │   └── sanitize.ts        # Sanitasi input
+│       │   ├── stores/                # Zustand stores
+│       │   │   ├── authStore.ts       # State management autentikasi
+│       │   │   └── loadingStore.ts    # State management loading
 │       │   ├── types/                 # Tipe data
 │       │   │   └── user.ts            # Tipe User dan 4 Role
 │       │   ├── middleware.ts          # Proteksi route (server-side)

@@ -4,11 +4,11 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { User, Mail, Lock, Bell, Save, ShieldCheck, BarChart3, Database, Webhook, Server } from 'lucide-react';
 import Layout from '@/components/Layout';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthStore } from '@/stores/authStore';
 
 export default function Pengaturan() {
   const router = useRouter();
-  const { user, hasAccess, getRoleDescription } = useAuth();
+  const { user, hasAccess, getRoleDescription } = useAuthStore();
 
   useEffect(() => {
     if (!user || !hasAccess('/pengaturan')) {

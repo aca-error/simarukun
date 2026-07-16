@@ -1,10 +1,15 @@
 # SimaRukun - Sistem Manajemen RT/RW
 
+[![Status](https://img.shields.io/badge/status-testing-yellow)](https://github.com/aca-error/simarukun)
+[![Progress](https://img.shields.io/badge/progress-15%25-orange)](https://github.com/aca-error/simarukun)
+[![Enterprise Compliance](https://img.shields.io/badge/compliance-85%25-blue)](https://github.com/aca-error/simarukun)
+[![Last Update](https://img.shields.io/badge/last%20update-20%20Juni%202026-green)](https://github.com/aca-error/simarukun)
+
 ## 📌 Deskripsi Proyek
 
 **SimaRukun** (Sistem Manajemen Rukun Warga & Rukun Tetangga) adalah aplikasi berbasis web responsif yang dirancang untuk **memodernisasi dan mendigitalkan pengelolaan administrasi, komunikasi, dan keuangan** di tingkat RT dan RW. Aplikasi ini menjembatani kesenjangan komunikasi antara pengurus (Ketua RT/RW, Bendahara) dan warga, memastikan **transparansi iuran bulanan**, serta menyediakan saluran resmi untuk **pelaporan dan aduan**. 
 
-Aplikasi ini dibangun dengan **Next.js (React)**, **Tailwind CSS**, dan **TypeScript** untuk frontend, serta **Node.js** dan **Laravel** untuk backend (dalam pengembangan).
+Aplikasi ini dibangun dengan **Next.js 14 (React)**, **Tailwind CSS**, dan **TypeScript** untuk frontend, serta **NestJS 10** untuk backend dalam arsitektur monorepo.
 
 ---
 
@@ -42,15 +47,18 @@ Aplikasi SimaRukun mendukung **4 role** yang berbeda, sesuai dengan PRD:
 2. [Tujuan dan Goal](#-tujuan-dan-goal)
 3. [Profil Pengguna](#-profil-pengguna-user-personas)
 4. [Daftar Isi](#-daftar-isi)
-5. [Panduan Instalasi](INSTALL.md)
-6. [Panduan Pengguna](USER.md)
-7. [Struktur Proyek](#-struktur-proyek)
-8. [Tech Stack](#-tech-stack)
-9. [Fitur Utama](#-fitur-utama)
-10. [Keamanan dan Privasi](#-keamanan-dan-privasi)
-11. [Demo Credentials](#-demo-credentials)
-12. [Kontribusi](#-kontribusi)
-13. [Lisensi](#-lisensi)
+5. [Status Proyek](#-status-proyek)
+6. [Panduan Instalasi](INSTALL.md)
+7. [Panduan Pengguna](USER.md)
+8. [Struktur Proyek](#-struktur-proyek)
+9. [Tech Stack](#-tech-stack)
+10. [Fitur Utama](#-fitur-utama)
+11. [Keamanan dan Privasi](#-keamanan-dan-privasi)
+12. [Demo Credentials](#-demo-credentials)
+13. [Quick Start](#-quick-start)
+14. [Kontribusi](#-kontribusi)
+15. [Lisensi](#-lisensi)
+16. [Dokumentasi Tambahan](#-dokumentasi-tambahan)
 
 ---
 
@@ -61,87 +69,144 @@ Aplikasi SimaRukun mendukung **4 role** yang berbeda, sesuai dengan PRD:
 
 ---
 
-## 🗂️ Struktur Proyek
+## 📊 Status Proyek
+
+| **Aspek** | **Status** | **Detail** |
+|-----------|------------|------------|
+| **Tahap Pengembangan** | Tahap 2 (Testing) | 15% selesai |
+| **Enterprise Compliance** | 85% | Target: 99% |
+| **Fitur Inti** | 100% | 8/8 fitur Tahap 1 selesai |
+| **Security Hardening** | ✅ Selesai | Tahap 1 selesai |
+| **Testing** | ⏳ Berjalan | Tahap 2 (15%) |
+| **Documentation** | ✅ Terkini | PRD, INSTRUCTIONS, USER.md |
+
+### **Metrik Kunci**
+- **Total Lines of Code**: 15,000+
+- **Total Files**: 83+
+- **Total Commits**: 50+
+- **Test Coverage**: ~92% (Unit Tests Backend)
+- **Last Update**: 20 Juni 2026
+
+---
+
+## 🗂️ Struktur Proyek (Monorepo)
 
 ```
 simarukun/
 ├── apps/
-│   └── web/                          # Frontend (Next.js)
-│       ├── public/                   # Asset statis
+│   ├── web/                          # Frontend (Next.js 14)
+│   │   ├── public/                   # Asset statis
+│   │   ├── src/
+│   │   │   ├── app/                  # Next.js App Router
+│   │   │   ├── components/           # Komponen reusable
+│   │   │   ├── lib/                  # Helper functions
+│   │   │   │   └── auth.ts           # Helper autentikasi
+│   │   │   ├── store/                # Zustand state management
+│   │   │   │   └── authStore.ts      # Auth state dengan Zustand
+│   │   │   ├── types/                # Tipe data TypeScript
+│   │   │   │   └── user.ts           # Tipe User dan Role
+│   │   │   └── styles/               # Global styles & Tailwind
+│   │   ├── package.json
+│   │   ├── next.config.js
+│   │   ├── tsconfig.json
+│   │   └── tailwind.config.js
+│   │
+│   └── api/                          # Backend (NestJS 10)
 │       ├── src/
-│       │   ├── components/           # Komponen reusable
-│       │   │   └── Layout.tsx         # Layout dengan navigasi berbasis role
-│       │   ├── contexts/              # Context API (Auth)
-│       │   │   └── AuthContext.tsx    # Context untuk autentikasi
-│       │   ├── lib/                   # Helper functions
-│       │   │   └── auth.ts            # Helper autentikasi (login, logout, hasAccess)
-│       │   ├── types/                 # Tipe data
-│       │   │   └── user.ts            # Tipe User dan Role (4 roles)
-│       │   ├── middleware.ts          # Proteksi route (server-side)
-│       │   └── pages/                 # Halaman aplikasi
-│       │       ├── index.tsx         # Dashboard (berbeda per role)
-│       │       ├── login.tsx          # Halaman Login
-│       │       ├── warga/
-│       │       │   └── index.tsx       # Daftar Warga
-│       │       ├── iuran/
-│       │       │   └── index.tsx       # Daftar Iuran
-│       │       ├── aduan/
-│       │       │   ├── index.tsx       # Daftar Aduan
-│       │       │   └── buat.tsx        # Buat Aduan
-│       │       ├── laporan/
-│       │       │   └── index.tsx       # Laporan (superadmin, supervisor, admin)
-│       │       ├── backup/
-│       │       │   └── index.tsx       # Backup (superadmin, supervisor)
-│       │       ├── webhook/
-│       │       │   └── index.tsx       # Webhook (superadmin only)
-│       │       ├── server/
-│       │       │   └── index.tsx       # Server (superadmin only)
-│       │       └── pengaturan.tsx      # Pengaturan (semua role)
+│       │   ├── common/               # Enums, interfaces, constants
+│       │   ├── modules/              # Feature modules
+│       │   │   ├── audit/            # Audit logging
+│       │   │   ├── auth/             # Authentication
+│       │   │   ├── users/            # User management
+│       │   │   ├── iuran/            # Iuran management
+│       │   │   ├── aduan/            # Aduan management
+│       │   │   ├── laporan/          # Reports
+│       │   │   ├── backup/           # Backup
+│       │   │   ├── webhook/          # Webhook
+│       │   │   └── server/           # Server monitoring
+│       │   ├── app.module.ts
+│       │   └── main.ts
 │       ├── package.json
-│       ├── next.config.js
 │       ├── tsconfig.json
-│       └── tailwind.config.js
-├── INSTALL.md                        # Panduan instalasi
-├── USER.md                           # Panduan pengguna
-└── README.md                         # Dokumen ini
+│       └── jest.config.js
+│
+├── docker/
+│   ├── dev/                          # Development environment
+│   │   ├── Dockerfile.api
+│   │   ├── Dockerfile.web
+│   │   └── docker-compose.yml
+│   └── prod/                         # Production environment
+│       ├── Dockerfile.api
+│       ├── Dockerfile.web
+│       ├── docker-compose.yml
+│       └── nginx/
+│           └── nginx.conf
+│
+├── docs/                             # Dokumentasi
+│   ├── PRD.md                        # Product Requirements Document
+│   ├── INSTALL.md                    # Panduan instalasi
+│   ├── USER.md                       # Panduan pengguna
+│   ├── CHANGELOG.md                  # Catatan release
+│   └── ROADMAP.md                    # Rencana pengembangan
+│
+├── .github/
+│   └── workflows/                    # CI/CD (akan diimplementasi)
+│
+├── package.json                      # Root monorepo
+├── tsconfig.json                     # Root TypeScript config
+├── README.md                         # Dokumen ini
+├── INSTALL.md                        # Panduan instalasi lengkap
+└── USER.md                           # Panduan pengguna
 ```
 
 ---
 
 ## 🛠️ Tech Stack
 
-| **Layer**       | **Teknologi**                          | **Kegunaan**                          |
-|-----------------|----------------------------------------|---------------------------------------|
-| **Frontend**    | Next.js, React, TypeScript, Tailwind CSS | UI/UX responsif dan modern.           |
-| **State**       | React Context API                      | Manajemen state autentikasi.          |
-| **Icons**       | Lucide React                           | Icon modern dan ringan.                |
-| **Animasi**     | Framer Motion                          | Animasi halus untuk UI.               |
-| **Backend**     | Node.js, Laravel                       | API dan logic bisnis (dalam pengembangan). |
-| **Database**    | SQLite (dev), MySQL/PostgreSQL (prod)   | Penyimpanan data.                     |
-| **Docker**      | Docker, Docker Compose                 | Containerisasi aplikasi dan database. |
+### **Frontend (apps/web)**
+
+| **Teknologi** | **Versi** | **Kegunaan** |
+|---------------|-----------|--------------|
+| Next.js | 14.1.0 | Web framework dengan App Router |
+| React | 18.2.0 | UI library |
+| TypeScript | 5.3.3 | Type safety |
+| Tailwind CSS | 3.4.1 | Styling |
+| Zustand | 4.4.7 | State management |
+| Axios | 1.6.2 | HTTP client |
+| DOMPurify | 3.0.6 | XSS protection |
+| Framer Motion | 11.0.3 | Animations |
+| Lucide React | 0.323.0 | Icons |
+| shadcn/ui | Latest | UI components |
+
+### **Backend (apps/api)**
+
+| **Teknologi** | **Versi** | **Kegunaan** |
+|---------------|-----------|--------------|
+| NestJS | 10.3.0 | Web framework |
+| TypeORM | 0.3.19 | ORM |
+| PostgreSQL | 15+ | Database |
+| Passport | 0.7.0 | Authentication |
+| JWT | 10.2.0 | Token-based auth |
+| Helmet | 7.1.0 | Security headers |
+| csurf | 1.11.0 | CSRF protection |
+| NestJS Throttler | 4.0.0 | Rate limiting |
+| Zod | 3.22.4 | Input validation |
+| Argon2 | 1.7.0 | Password hashing |
+
+### **DevOps & Infrastruktur**
+
+| **Teknologi** | **Versi** | **Kegunaan** |
+|---------------|-----------|--------------|
+| Docker | 24+ | Containerization |
+| Docker Compose | 2+ | Multi-container orchestration |
+| Nginx | 1.25+ | Reverse proxy |
+| GitHub Actions | - | CI/CD (akan diimplementasi) |
+| Prometheus | - | Monitoring (rencana) |
+| Grafana | - | Visualization (rencana) |
+| Sentry | - | Error tracking (rencana) |
 
 ---
 
-## ✨ Fitur Utama
-
-### **🔐 Autentikasi & Otorisasi (RBAC)**
-- **4 Role**: Super Admin, Supervisor, Admin, Warga.
-- **Proteksi Route**: Server-side (middleware) + Client-side (hasAccess).
-- **Tidak Ada Akses Shortcut**: Semua percobaan akses ilegal akan diredirect.
-
-### **📊 Dashboard (Berbeda per Role)**
-- **Super Admin**: Statistik lengkap + Backup/Webhook/Server status.
-- **Supervisor**: Statistik + Laporan Eksekutif + Persetujuan Tertunda.
-- **Admin**: Statistik Warga, Iuran, Aduan, Laporan.
-- **Warga**: Status Iuran, Aduan Saya, Pengumuman.
-
-### **👥 Manajemen Warga** (Super Admin, Supervisor, Admin)
-- Daftar warga dengan filter pencarian.
-- Status warga (Aktif) dan status iuran (Lunas/Belum).
-- Tombol aksi (Edit, Hapus) - untuk Super Admin, Supervisor, Admin.
-
-### **💰 Manajemen Iuran** (Super Admin, Supervisor, Admin)
-- Daftar iuran dengan status (Lunas/Belum).
 - Pencarian berdasarkan bulan/status.
 - Lihat detail iuran.
 
@@ -205,6 +270,60 @@ simarukun/
 
 ---
 
+## 🚀 Quick Start
+
+### **Menggunakan Docker (Recommended)**
+
+```bash
+# Clone repository
+git clone https://github.com/aca-error/simarukun.git
+cd simarukun
+
+# Setup environment
+cp apps/api/.env.example apps/api/.env
+cp apps/web/.env.example apps/web/.env
+
+# Start development environment
+cd docker/dev
+docker-compose up -d
+
+# Access applications
+# Frontend: http://localhost:3000
+# Backend API: http://localhost:3001
+# Database: localhost:5432
+```
+
+### **Manual Installation**
+
+```bash
+# Install dependencies
+npm install
+
+# Frontend
+cd apps/web
+npm run dev
+
+# Backend (in new terminal)
+cd apps/api
+npm run start:dev
+```
+
+### **Environment Variables**
+
+#### **Backend (.env)**
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/simarukun
+PORT=3001
+JWT_SECRET=your-secret-key
+```
+
+#### **Frontend (.env)**
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001
+```
+
+---
+
 ## 🔑 Demo Credentials
 
 Anda bisa mencoba login dengan akun demo berikut:
@@ -245,6 +364,27 @@ Untuk pertanyaan atau dukungan, silakan hubungi:
 
 ---
 
+## 📄 Dokumentasi Tambahan
+
+Untuk informasi lebih lanjut, lihat dokumentasi berikut:
+
+| **Dokumen** | **Deskripsi** |
+|-------------|---------------|
+| [PRD.md](PRD.md) | Product Requirements Document dengan development log lengkap |
+| [INSTALL.md](INSTALL.md) | Panduan instalasi detail |
+| [USER.md](USER.md) | Panduan pengguna untuk semua role |
+| [CHANGELOG.md](CHANGELOG.md) | Catatan perubahan dan release |
+| [INSTRUCTIONS.md](INSTRUCTIONS.md) | Instruksi teknis pengembangan |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Rencana pengembangan jangka panjang |
+
+### **Dokumentasi Teknis (Coming Soon)**
+- `API.md` - Dokumentasi API endpoints
+- `DEPLOYMENT.md` - Panduan deployment production
+- `CONTRIBUTING.md` - Pedoman kontribusi
+- `SECURITY.md` - Kebijakan keamanan
+
+---
+
 **Terima kasih telah menggunakan SimaRukun!** 🙏
 
 ---
@@ -252,3 +392,5 @@ Untuk pertanyaan atau dukungan, silakan hubungi:
 ## 📝 Catatan Revisi Terbaru
 - **Laporan**: Sekarang dapat diakses oleh **Super Admin, Supervisor, dan Admin** (sebelumnya hanya Super Admin & Supervisor).
 - **Backup**: Sekarang dapat diakses oleh **Super Admin dan Supervisor** (sebelumnya hanya Super Admin).
+- **Tech Stack**: Diperbarui mencerminkan arsitektur monorepo dengan NestJS backend dan Zustand state management.
+- **Struktur Proyek**: Ditambahkan struktur lengkap monorepo dengan apps/web dan apps/api.

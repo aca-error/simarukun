@@ -3,27 +3,49 @@
 import { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthStore } from '@/stores/authStore';
+import { loginApi } from '@/lib/api';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { login } = useAuth();
+  const { login } = useAuthStore();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email && password) {
-      const success = login(email, password);
-      if (success) {
-        router.push('/');
-      } else {
-        setError('Email atau password salah.');
-      }
-    } else {
+    setError('');
+    
+    if (!email || !password) {
       setError('Email dan password harus diisi.');
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      const response = await loginApi({ email, password });
+      
+      // Store tokens
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('access_token', response.accessToken);
+        localStorage.setItem('refresh_token', response.refreshToken);
+      }
+      
+      // Update Zustand store
+      login(response.user);
+      
+      router.push('/');
+    } catch (err: any) {
+      setError(
+        err.response?.data?.message || 
+        'Email atau password salah. Pastikan backend API berjalan.'
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -73,9 +95,12 @@ export default function Login() {
           </div>
           <button
             type="submit"
-            className="w-full bg-primary-600 text-white py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors"
+            disabled={isLoading}
+            className={`w-full bg-primary-600 text-white py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors ${
+              isLoading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
           >
-            Masuk
+            {isLoading ? 'Memproses...' : 'Masuk'}
           </button>
         </form>
         <div className="mt-6 text-center text-sm text-gray-500 space-y-2">

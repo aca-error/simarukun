@@ -1,173 +1,55 @@
+```
 # Dependencies
 node_modules/
-.pnp
-.pnp.js
 
-# Testing
-coverage/
-.nyc_output/
-
-# Next.js
+# Build outputs
+dist/
+build/
 .next/
 out/
 
-# Production
-build/
-dist/
-
-# Environment
+# Environment variables
 .env
 .env.local
-.env.development
-.env.test
-.env.production
 .env.*
 
-# IDE
-.idea/
+# IDE files
 .vscode/
+.idea/
 *.swp
 *.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
 
 # Logs
-logs/
 *.log
-
-# Uploads
-uploads/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Debug
-debug.log
-*.lcov
-
-# Local History
-.history/
-
-# Cache
-.cache/
-.eslintcache
 
 # Temporary files
 *.tmp
-*.temp
 
-# Docker
-.docker/
+# Python specific
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
-# Local database
-*.sqlite
-*.db
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
 
-# Local SSL
-*.crt
-*.key
-*.pem
+# System files
+.DS_Store
+Thumbs.db
 
-# Local secrets
-*.secret
-*.json.key
-
-# Local backup
-*.sql
-*.sql.gz
-backups/
-
-# Local coverage
+# Cache directories
+.cache/
+.mypy_cache/
+.pytest_cache/
+.nyc_output/
 coverage/
 
-# Local test results
-.test.cache
-
-# Local node modules (if not using npm ci)
-node_modules/
-
-# Local npm cache
-.npm
-
-# Local yarn cache
-.yarn/cache
-.yarn/unplugged
-.yarn/install-state.gz
-
-# Local pnpm cache
-.pnpm-store
-
-# Local next.js cache
-.next/cache/
-
-# Local vercel cache
-.vercel/
-
-# Local netlify cache
-.netlify/
-
-# Local serverless cache
-.serverless/
-
-# Local firebase cache
-.firebase/
-
-# Local android cache
-.android/
-
-# Local ios cache
-.ios/
-
-# Local flutter cache
-.flutter/
-
-# Local dart cache
-.dart_tool/
-
-# Local python cache
-__pycache__/
-*.py[cod]
-*$py.class
-
-# Local java cache
-*.class
-*.jar
-*.war
-*.ear
-
-# Local ruby cache
-*.gem
-.bundle/
-
-# Local go cache
-*.go
-.bin/
-
-# Local rust cache
-.target/
-Cargo.lock
-
-# Local php cache
-*.php
-.vendor/
-
-# Local dotnet cache
-bin/
-obj/
-
-# Local unity cache
-Library/
-Temp/
-
-# Local unreal cache
-Saved/
-DerivedDataCache/
-
-# Local godot cache
-.godot/
-
-# Local blender cache
-.blend
+# Distribution / packaging
+*.tar.gz
+*.whl
+*.egg
+*.egg-info/
+```

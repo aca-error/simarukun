@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Server, Cpu, MemoryStick, Network, Activity, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 import Layout from '@/components/Layout';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthStore } from '@/stores/authStore';
 
 // Dummy data for server monitoring
 const serverStats = {
@@ -26,7 +26,7 @@ const recentActivities = [
 
 export default function Server() {
   const router = useRouter();
-  const { user, hasAccess, getRoleDescription } = useAuth();
+  const { user, hasAccess, getRoleDescription } = useAuthStore();
 
   useEffect(() => {
     if (!user || !hasAccess('/server')) {

@@ -4,11 +4,11 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { Camera, Send } from 'lucide-react';
 import Layout from '@/components/Layout';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthStore } from '@/stores/authStore';
 
 export default function BuatAduan() {
   const router = useRouter();
-  const { user, hasAccess } = useAuth();
+  const { user, hasAccess } = useAuthStore();
 
   useEffect(() => {
     if (!user || !hasAccess('/aduan')) {

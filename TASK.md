@@ -30,10 +30,10 @@ Update status setiap kali mulai/menyelesaikan pekerjaan.
 |------|-------|---------|----------|
 | P0 Blocker | 12 | 12 | 100% |
 | P1 Keamanan | 14 | 14 | 100% |
-| P2 Bisnis & Integrasi | 16 | 0 | 0% |
+| P2 Bisnis & Integrasi | 17 | 1 | 6% |
 | P3 Production | 12 | 2 | 17% |
 | P4 Docs & Testing | 10 | 1 | 10% |
-| **Total** | **64** | **29** | **45%** |
+| **Total** | **65** | **30** | **46%** |
 
 > Update tabel di atas setiap kali menutup task.
 
@@ -412,6 +412,25 @@ Update status setiap kali mulai/menyelesaikan pekerjaan.
   - Di production (`NODE_ENV === 'production'`): return `{ error: 'Database connection failed' }`.
   - Di development: tetap tampilkan `error.stack`.
 - **Notes:** Detail error tetap tercatat di Winston/Sentry.
+
+---
+
+### TASK-013 — Migrasi dari AuthContext ke Zustand
+
+- **Status:** `[x]`
+- **Prioritas:** P2
+- **File:** `apps/web/src/stores/authStore.ts`, `apps/web/src/pages/**/*.tsx`
+- **Bug found:**
+  - PRD.md menyebut Zustand untuk state management, tetapi kode masih pakai React Context (`AuthContext.tsx`).
+  - Inkonsistensi dokumentasi dan implementasi.
+- **Bug fixed:**
+  - Dibuat `authStore.ts` dengan Zustand pattern.
+  - Semua halaman (11 files) migrasi dari `useAuth` ke `useAuthStore`.
+  - File legacy `AuthContext.tsx` dan `lib/auth.ts` dihapus.
+  - Folder `contexts/` dihapus karena tidak lagi digunakan.
+- **Notes:**
+  - Dokumentasi INSTALL.md diperbarui mencerminkan struktur baru.
+  - Tidak ada breaking changes untuk user.
 
 ---
 
