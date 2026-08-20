@@ -29,9 +29,9 @@
     "clean": "rm -rf node_modules apps/*/node_modules apps/*/dist apps/*/.next"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2",
+    "concurrently": "^9.0.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "typescript": "^5.7.2"
   },
   "engines": {
     "node": ">=18.0.0"
