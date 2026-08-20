@@ -3,11 +3,12 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth.service';
+import { UserRole } from '../../../common/enums/user-role.enum';
 
 export interface JwtPayload {
   sub: string;
   email: string;
-  role: string;
+  role: UserRole;
 }
 
 @Injectable()
@@ -16,10 +17,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private configService: ConfigService,
     private authService: AuthService,
   ) {
+    const jwtSecret = configService.get<string>('JWT_SECRET') || 'default-secret-key';
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_SECRET'),
+      secretOrKey: jwtSecret,
     });
   }
 
@@ -29,7 +31,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const user = await this.authService.validateJwtPayload({
       sub: payload.sub,
       email: payload.email,
-      role: payload.role as any,
+      role: payload.role,
     });
 
     // Attach the refresh token from the database to the request

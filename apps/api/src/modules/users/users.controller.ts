@@ -20,6 +20,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../../common/enums/user-role.enum';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery, ApiParam } from '@nestjs/swagger';
+import { AuthRequest } from '../../common/types';
 
 @ApiTags('Users')
 @Controller('users')
@@ -33,14 +34,14 @@ export class UsersController {
    */
   @Get()
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR)
-  @Throttle(100, 60000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @ApiOperation({ summary: 'Get all users (Super Admin & Supervisor only)' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'role', required: false, type: String })
   @ApiQuery({ name: 'isActive', required: false, type: Boolean })
   async findAll(
-    @Request() req,
+    @Request() req: AuthRequest,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
     @Query('role') role?: UserRole,
@@ -54,10 +55,10 @@ export class UsersController {
    */
   @Get('search')
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR)
-  @Throttle(100, 60000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @ApiOperation({ summary: 'Search users (Super Admin & Supervisor only)' })
   @ApiQuery({ name: 'q', required: true, type: String })
-  async search(@Query('q') query: string, @Request() req) {
+  async search(@Query('q') query: string, @Request() req: AuthRequest) {
     return this.usersService.search(query);
   }
 
@@ -66,10 +67,10 @@ export class UsersController {
    */
   @Get(':id')
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR, UserRole.ADMIN)
-  @Throttle(100, 60000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @ApiOperation({ summary: 'Get user by ID (Super Admin, Supervisor, Admin)' })
   @ApiParam({ name: 'id', type: String })
-  async findOne(@Param('id') id: string, @Request() req) {
+  async findOne(@Param('id') id: string, @Request() req: AuthRequest) {
     const user = await this.usersService.findById(id);
     if (!user) {
       throw new NotFoundException('User not found');
@@ -82,7 +83,7 @@ export class UsersController {
    */
   @Post()
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR)
-  @Throttle(100, 60000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @ApiOperation({ summary: 'Create a new user (Super Admin & Supervisor only)' })
   async create(@Body() createUserDto: CreateUserDto, @Request() req) {
     return this.usersService.create(createUserDto);
@@ -93,7 +94,7 @@ export class UsersController {
    */
   @Put(':id/toggle-active')
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR)
-  @Throttle(100, 60000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @ApiOperation({ summary: 'Toggle user active status (Super Admin & Supervisor only)' })
   @ApiParam({ name: 'id', type: String })
   async toggleActive(@Param('id') id: string, @Request() req) {
@@ -105,7 +106,7 @@ export class UsersController {
    */
   @Put(':id')
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR)
-  @Throttle(100, 60000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @ApiOperation({ summary: 'Update a user (Super Admin & Supervisor only)' })
   @ApiParam({ name: 'id', type: String })
   async update(
@@ -121,7 +122,7 @@ export class UsersController {
    */
   @Delete(':id')
   @Roles(UserRole.SUPERADMIN)
-  @Throttle(100, 60000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @ApiOperation({ summary: 'Delete a user (Super Admin only)' })
   @ApiParam({ name: 'id', type: String })
   async remove(@Param('id') id: string, @Request() req) {

@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
-import * as Sentry from '@sentry/node';
+import * as Sentry from '@sentry/nestjs';
 import { Request, Response, NextFunction, CookieOptions } from 'express';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { TransformResponseInterceptor } from './common/interceptors/transform-response.interceptor';
@@ -16,7 +16,7 @@ async function bootstrap() {
       release: process.env.RELEASE_VERSION || '1.2.0',
       integrations: [
         Sentry.httpIntegration(),
-        Sentry.expressIntegration(),
+        Sentry.postgresIntegration(),
       ],
     });
   }
@@ -53,14 +53,13 @@ async function bootstrap() {
           connectSrc: ["'self'"],
           fontSrc: ["'self'"],
           objectSrc: ["'none'"],
-          frameguard: { action: 'deny' },
+          frameguard: ['deny'],
           baseUri: ["'self'"],
           formAction: ["'self'"],
         },
       },
       hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
       xssFilter: true,
-      frameguard: { action: 'deny' },
       noSniff: true,
       referrerPolicy: { policy: 'no-referrer-when-downgrade' },
     }),
@@ -99,10 +98,9 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
-  app.use(Sentry.Handlers.requestHandler());
-  app.use(Sentry.Handlers.tracingHandler());
-  app.use(Sentry.Handlers.errorHandler());
-
+  // Sentry request and error handlers are now handled by integrations
+  // No need for manual middleware in v8
+  
   const port = process.env.PORT || 3001;
   await app.listen(port);
 

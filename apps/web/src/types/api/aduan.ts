@@ -11,6 +11,7 @@ export interface Aduan {
   id: string;
   userId: string;
   judul: string;
+  isi?: string;
   deskripsi: string;
   kategori: AduanKategori;
   status: AduanStatus;
@@ -20,7 +21,14 @@ export interface Aduan {
   catatan?: string;
   createdAt: string;
   updatedAt: string;
+  created_at?: string;
   user?: {
+    id: string;
+    nama: string;
+    email: string;
+    name?: string;
+  };
+  warga?: {
     id: string;
     nama: string;
     email: string;

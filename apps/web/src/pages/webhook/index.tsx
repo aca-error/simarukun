@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Webhook, CheckCircle, XCircle, RefreshCw, Code, Bell, Clock } from 'lucide-react';
+import { Webhook as WebhookIcon, CheckCircle, XCircle, RefreshCw, Code, Bell, Clock } from 'lucide-react';
 import Layout from '@/components/Layout';
 import { useAuthStore } from '@/stores/authStore';
 
@@ -85,7 +85,7 @@ export default function Webhook() {
                 <tr key={webhook.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     <div className="flex items-center">
-                      <Webhook className="h-5 w-5 text-purple-600 mr-2" />
+                      <WebhookIcon className="h-5 w-5 text-purple-600 mr-2" />
                       {webhook.nama}
                     </div>
                   </td>
@@ -128,7 +128,7 @@ export default function Webhook() {
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-white p-3 rounded-lg border text-center">
-              <Webhook className="h-6 w-6 text-purple-600 mx-auto" />
+              <WebhookIcon className="h-6 w-6 text-purple-600 mx-auto" />
               <p className="text-2xl font-bold text-gray-900 mt-1">3</p>
               <p className="text-xs text-gray-500">Total Webhook</p>
             </div>

@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/stores/authStore';
 import Layout from '@/components/Layout';
 import { TrendingUp, Plus, Edit, Trash2, Search, Filter } from 'lucide-react';
-import { iuranApi, Iuran } from '@/lib/api';
+import { iuranApi } from '@/lib/api';
+import type { Iuran } from '@/lib/api/iuran';
 
 export default function IuranPage() {
   const { user, isAuthenticated } = useAuthStore();

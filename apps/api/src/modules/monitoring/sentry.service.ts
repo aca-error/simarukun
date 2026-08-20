@@ -69,10 +69,10 @@ export class SentryService implements OnModuleInit {
   }
 
   /**
-   * Start a transaction (Sentry v7 compatibility)
+   * Start a transaction (Sentry v8)
    */
   startTransaction(name: string, options?: Record<string, unknown>) {
-    return Sentry.startTransaction({ name, ...options });
+    return Sentry.startSpan({ name, ...options }, (span) => span);
   }
 
   /**
@@ -105,7 +105,7 @@ export class SentryService implements OnModuleInit {
    * Clear context
    */
   clearContext() {
-    Sentry.getCurrentHub().getScope()?.clear();
+    Sentry.getIsolationScope().clear();
   }
 
   /**

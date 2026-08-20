@@ -1,13 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/stores/authStore';
 import Layout from '@/components/Layout';
 import { 
   TrendingUp, Users, FileText, AlertCircle, 
   BarChart3, Database, Webhook, Server, CheckCircle
 } from 'lucide-react';
 import { wargaApi, iuranApi, aduanApi } from '@/lib/api';
+import type { Warga } from '@/lib/api/warga';
+import type { Iuran } from '@/lib/api/iuran';
+import type { Aduan } from '@/types/api/aduan';
 
 interface DashboardStats {
   totalWarga?: number;
@@ -30,15 +33,15 @@ export default function Home() {
       try {
         // Fetch stats based on role
         const [wargaData, iuranData, aduanData] = await Promise.all([
-          wargaApi.getAll().catch(() => []),
-          iuranApi.getAll().catch(() => []),
-          aduanApi.getAll({ status: 'pending' }).catch(() => []),
+          wargaApi.getAll().catch(() => [] as Warga[]),
+          iuranApi.getAll().catch(() => [] as Iuran[]),
+          aduanApi.getAll({ status: 'pending' }).catch(() => ({ data: [] }) as any),
         ]);
 
         setStats({
           totalWarga: wargaData.length,
-          totalIuran: iuranData.reduce((sum, i) => sum + i.nominal, 0),
-          aduanBaru: aduanData.length,
+          totalIuran: iuranData.reduce((sum: number, i: Iuran) => sum + i.nominal, 0),
+          aduanBaru: (aduanData as any).data?.length || 0,
           laporanCount: iuranData.filter(i => i.status === 'lunas').length,
         });
       } catch (error) {

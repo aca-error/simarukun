@@ -2,6 +2,10 @@
  * Shared types and interfaces for the entire application
  */
 
+import { Request } from 'express';
+import { UserRole } from '../../common/enums/user-role.enum';
+import { User } from '../../modules/users/entities/user.entity';
+
 /**
  * Standardized pagination interface
  */
@@ -99,4 +103,20 @@ export interface BaseStats {
  * Authenticated request interface
  */
 export interface AuthRequest extends Request {
-  user: {\n    id: string;\n    email: string;\n    role: UserRoleType;\n    nama: string;\n  };\n}
+  user: {
+    id: string;
+    email: string;
+    role: UserRole;
+    nama: string;
+  } & Partial<User>;
+}
+
+/**
+ * Minimal User type for JWT payload and request context
+ */
+export interface UserContext {
+  id: string;
+  email: string;
+  role: UserRole;
+  nama: string;
+}

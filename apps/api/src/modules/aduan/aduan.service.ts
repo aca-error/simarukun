@@ -4,7 +4,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOptionsWhere, Like } from 'typeorm';
+import { Repository, FindOptionsWhere, Like, FindOptionsRelations } from 'typeorm';
 import { Aduan } from './entities/aduan.entity';
 import { CreateAduanDto } from './dto/create-aduan.dto';
 import { UpdateAduanDto } from './dto/update-aduan.dto';
@@ -37,6 +37,7 @@ export class AduanService {
     kategori?: string,
   ): Promise<PaginatedResult<Aduan>> {
     const where: FindOptionsWhere<Aduan> = {};
+    const relations: FindOptionsRelations<Aduan> = { user: true };
 
     if (status) {
       where.status = status as any;
@@ -51,7 +52,7 @@ export class AduanService {
       order: { createdAt: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,
-      relations: ['user'],
+      relations,
     });
 
     return {
@@ -68,7 +69,7 @@ export class AduanService {
   async findOne(id: string): Promise<Aduan> {
     const aduan = await this.aduanRepository.findOne({
       where: { id },
-      relations: ['user'],
+      relations: { user: true },
     });
 
     if (!aduan) {
@@ -152,7 +153,7 @@ export class AduanService {
     return this.aduanRepository.find({
       where: { userId },
       order: { createdAt: 'DESC' },
-      relations: ['user'],
+      relations: { user: true },
     });
   }
 
@@ -224,7 +225,7 @@ export class AduanService {
       ],
       order: { createdAt: 'DESC' },
       take: 10,
-      relations: ['user'],
+      relations: { user: true },
     });
   }
 
@@ -235,7 +236,7 @@ export class AduanService {
     return this.aduanRepository.find({
       order: { createdAt: 'DESC' },
       take: limit,
-      relations: ['user'],
+      relations: { user: true },
     });
   }
 }

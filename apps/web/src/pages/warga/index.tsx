@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/stores/authStore';
 import Layout from '@/components/Layout';
 import { Users, Plus, Edit, Trash2, Search } from 'lucide-react';
-import { wargaApi, Warga } from '@/lib/api';
+import { wargaApi } from '@/lib/api';
+import type { Warga } from '@/lib/api/warga';
 
 export default function WargaPage() {
   const { user, isAuthenticated } = useAuthStore();

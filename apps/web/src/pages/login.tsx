@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/stores/authStore';
 import { authApi } from '@/lib/api';
 
 export default function Login() {

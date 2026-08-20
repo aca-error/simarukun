@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/stores/authStore';
 import Layout from '@/components/Layout';
 import { AlertCircle, Plus, Edit, Trash2, Search, Filter } from 'lucide-react';
-import { aduanApi, Aduan } from '@/lib/api';
+import { aduanApi } from '@/lib/api';
+import type { Aduan } from '@/types/api/aduan';
 
 export default function AduanPage() {
   const { user, isAuthenticated } = useAuthStore();
@@ -64,7 +65,7 @@ export default function AduanPage() {
   };
 
   const canManage = user?.role === 'superadmin' || user?.role === 'supervisor' || user?.role === 'admin';
-  const aduanPending = aduanList.filter(a => a.status === 'pending').length;
+  const aduanPending = aduanList.filter(a => a.status === 'BARU').length;
 
   return (
     <Layout>
@@ -106,7 +107,7 @@ export default function AduanPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-green-100">Selesai</p>
-                <p className="text-3xl font-bold mt-2">{aduanList.filter(a => a.status === 'selesai').length}</p>
+                <p className="text-3xl font-bold mt-2">{aduanList.filter(a => a.status === 'SELESAI').length}</p>
               </div>
               <AlertCircle className="h-12 w-12 text-green-200" />
             </div>
