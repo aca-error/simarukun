@@ -10,16 +10,9 @@ import { CreateIuranDto } from './dto/create-iuran.dto';
 import { UpdateIuranDto } from './dto/update-iuran.dto';
 import { User } from '../users/entities/user.entity';
 import { UserRole } from '../../common/enums/user-role.enum';
+import { PaginatedResult, BaseStats } from '../../common/types';
 
-export interface PaginatedResult<T> {
-  data: T[];
-  total: number;
-  page: number;
-  limit: number;
-}
-
-export interface IuranReport {
-  totalIuran: number;
+export interface IuranReport extends BaseStats {
   totalDibayar: number;
   totalBelumDibayar: number;
   totalTelat: number;

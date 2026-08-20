@@ -4,6 +4,8 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import * as Sentry from '@sentry/node';
 import { Request, Response, NextFunction, CookieOptions } from 'express';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { TransformResponseInterceptor } from './common/interceptors/transform-response.interceptor';
 
 async function bootstrap() {
   if (process.env.SENTRY_DSN) {
@@ -31,7 +33,14 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
 
+  // Global prefix for API routes
   app.setGlobalPrefix('api');
+
+  // Global exception filter for standardized error responses
+  app.useGlobalFilters(new AllExceptionsFilter());
+
+  // Global interceptor for standardized success responses
+  app.useGlobalInterceptors(new TransformResponseInterceptor());
 
   app.use(
     helmet({
@@ -44,7 +53,7 @@ async function bootstrap() {
           connectSrc: ["'self'"],
           fontSrc: ["'self'"],
           objectSrc: ["'none'"],
-          frameSrc: ["'none'"],
+          frameguard: { action: 'deny' },
           baseUri: ["'self'"],
           formAction: ["'self'"],
         },
