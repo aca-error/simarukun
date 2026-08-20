@@ -12,7 +12,7 @@ export class HealthController {
    * Basic health check
    */
   @Get()
-  @Throttle(30, 60000)
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
   @ApiOperation({ summary: 'Basic health check' })
   @ApiResponse({ status: 200, description: 'Service is healthy' })
   async check() {
@@ -23,7 +23,7 @@ export class HealthController {
    * Detailed health check with dependencies
    */
   @Get('detailed')
-  @Throttle(30, 60000)
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
   @ApiOperation({ summary: 'Detailed health check with dependencies' })
   @ApiResponse({ status: 200, description: 'Detailed health status' })
   async checkDetailed() {
@@ -34,7 +34,7 @@ export class HealthController {
    * Database health check
    */
   @Get('db')
-  @Throttle(30, 60000)
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
   @ApiOperation({ summary: 'Database health check' })
   @ApiResponse({ status: 200, description: 'Database is healthy' })
   @ApiResponse({ status: 503, description: 'Database connection failed' })
@@ -46,7 +46,7 @@ export class HealthController {
    * Redis health check (if configured)
    */
   @Get('redis')
-  @Throttle(30, 60000)
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
   @ApiOperation({ summary: 'Redis health check' })
   @ApiResponse({ status: 200, description: 'Redis is healthy' })
   @ApiResponse({ status: 503, description: 'Redis connection failed' })

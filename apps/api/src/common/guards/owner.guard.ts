@@ -18,7 +18,7 @@ export const OWNER_CHECK_KEY = 'owner_check';
  */
 export const CheckOwner = () => {
   return (target: any, propertyKey: string) => {
-    Reflect.setMetadata(OWNER_CHECK_KEY, true, target, propertyKey);
+    Reflect.defineMetadata(OWNER_CHECK_KEY, true, target, propertyKey);
   };
 };
 

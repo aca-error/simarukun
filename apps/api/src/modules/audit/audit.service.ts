@@ -53,7 +53,7 @@ export class AuditService {
       order: { createdAt: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,
-      relations: ['user'],
+      relations: { user: true },
     });
 
     return { data, total, page, limit };
@@ -67,7 +67,7 @@ export class AuditService {
     return this.auditLogRepository.find({
       where: { action },
       order: { createdAt: 'DESC' },
-      relations: ['user'],
+      relations: { user: true },
     });
   }
 
@@ -79,7 +79,7 @@ export class AuditService {
     return this.auditLogRepository.find({
       order: { createdAt: 'DESC' },
       take: count,
-      relations: ['user'],
+      relations: { user: true },
     });
   }
 }

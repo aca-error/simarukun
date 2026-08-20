@@ -1,6 +1,5 @@
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
-import * as Sentry from '@sentry/nextjs';
 
 // Sentry Error Boundary Component
 function SentryErrorBoundary({ children }: { children: React.ReactNode }) {
@@ -16,5 +15,4 @@ function MyApp({ Component, pageProps }: AppProps) {
   );
 }
 
-// Export both for compatibility
-export default Sentry.withSentry(MyApp);
+export default MyApp;

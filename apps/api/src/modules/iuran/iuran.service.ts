@@ -10,9 +10,10 @@ import { CreateIuranDto } from './dto/create-iuran.dto';
 import { UpdateIuranDto } from './dto/update-iuran.dto';
 import { User } from '../users/entities/user.entity';
 import { UserRole } from '../../common/enums/user-role.enum';
-import { PaginatedResult, BaseStats } from '../../common/types';
+import { PaginatedResult, BaseStats, UserContext } from '../../common/types';
 
 export interface IuranReport extends BaseStats {
+  totalIuran: number;
   totalDibayar: number;
   totalBelumDibayar: number;
   totalTelat: number;
@@ -59,7 +60,7 @@ export class IuranService {
       order: { tanggalJatuhTempo: 'DESC', createdAt: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,
-      relations: ['user'],
+      relations: { user: true },
     });
 
     return {
@@ -76,7 +77,7 @@ export class IuranService {
   async findOne(id: string): Promise<Iuran> {
     const iuran = await this.iuranRepository.findOne({
       where: { id },
-      relations: ['user'],
+      relations: { user: true },
     });
 
     if (!iuran) {
@@ -89,10 +90,9 @@ export class IuranService {
   /**
    * Create a new iuran record
    */
-  async create(createIuranDto: CreateIuranDto, user: User): Promise<Iuran> {
+  async create(createIuranDto: CreateIuranDto, user: UserContext): Promise<Iuran> {
     const iuran = this.iuranRepository.create({
       ...createIuranDto,
-      user,
       userId: user.id,
       tanggalJatuhTempo: new Date(createIuranDto.tanggalJatuhTempo),
     });
@@ -106,7 +106,7 @@ export class IuranService {
   async update(
     id: string,
     updateIuranDto: UpdateIuranDto,
-    currentUser: User,
+    currentUser: UserContext,
   ): Promise<Iuran> {
     const iuran = await this.findOne(id);
 
@@ -131,7 +131,7 @@ export class IuranService {
   /**
    * Delete an iuran record
    */
-  async remove(id: string, currentUser: User): Promise<Iuran> {
+  async remove(id: string, currentUser: UserContext): Promise<Iuran> {
     const iuran = await this.findOne(id);
 
     // Check if user has permission to delete this iuran
@@ -153,7 +153,7 @@ export class IuranService {
     return this.iuranRepository.find({
       where: { userId },
       order: { tanggalJatuhTempo: 'DESC', createdAt: 'DESC' },
-      relations: ['user'],
+      relations: { user: true },
     });
   }
 
@@ -195,6 +195,7 @@ export class IuranService {
       totalJumlah,
       totalJumlahDibayar,
       totalJumlahBelumDibayar,
+      total: totalIuran,
     };
   }
 
@@ -249,7 +250,7 @@ export class IuranService {
         status: 'BELUM_BAYAR',
       },
       order: { tanggalJatuhTempo: 'ASC' },
-      relations: ['user'],
+      relations: { user: true },
     });
   }
 
@@ -262,7 +263,7 @@ export class IuranService {
         tanggalJatuhTempo: Between(startDate, endDate),
       },
       order: { tanggalJatuhTempo: 'ASC' },
-      relations: ['user'],
+      relations: { user: true },
     });
   }
 }

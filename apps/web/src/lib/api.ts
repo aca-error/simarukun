@@ -127,3 +127,9 @@ export const refreshTokenApi = async (refreshToken: string): Promise<{ accessTok
 };
 
 export default apiClient;
+
+// Re-export specific API modules
+export { authApi } from './api/auth';
+export { aduanApi } from './api/aduan';
+export { iuranApi } from './api/iuran';
+export { wargaApi } from './api/warga';

@@ -26,7 +26,7 @@ export class AuthController {
    */
   @Post('login')
   @Public()
-  @Throttle(5, 1000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login user' })
   @ApiBody({
@@ -53,7 +53,7 @@ export class AuthController {
    */
   @Post('register')
   @Public()
-  @Throttle(5, 1000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Register new user' })
   @ApiBody({
@@ -82,7 +82,7 @@ export class AuthController {
    */
   @Post('refresh')
   @Public()
-  @Throttle(5, 1000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiBody({
@@ -106,7 +106,7 @@ export class AuthController {
    * Logout user
    */
   @Post('logout')
-  @Throttle(100, 60000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -121,7 +121,7 @@ export class AuthController {
    * Get current user profile
    */
   @Get('profile')
-  @Throttle(100, 60000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user profile' })

@@ -4,6 +4,7 @@ export type UserRole = 'superadmin' | 'supervisor' | 'admin' | 'warga';
 export interface User {
   id: string;
   nama: string;
+  name?: string;
   email: string;
   role: UserRole;
 }

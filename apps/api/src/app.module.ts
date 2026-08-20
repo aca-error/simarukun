@@ -52,8 +52,12 @@ import { MetricsInterceptor } from './modules/monitoring/metrics.interceptor';
     }),
 
     ThrottlerModule.forRoot({
-      ttl: 60000,
-      limit: 100,
+      throttlers: [
+        {
+          ttl: 60000,
+          limit: 100,
+        },
+      ],
     }),
 
     AuditModule,

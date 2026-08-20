@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Server, Cpu, MemoryStick, Network, Activity, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
+import { Server as ServerIcon, Cpu, MemoryStick, Network, Activity, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 import Layout from '@/components/Layout';
 import { useAuthStore } from '@/stores/authStore';
 
@@ -73,7 +73,7 @@ export default function Server() {
         {/* Server Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
           <div className="bg-white p-4 rounded-xl shadow-sm border text-center">
-            <Server className="h-8 w-8 text-purple-600 mx-auto" />
+            <ServerIcon className="h-8 w-8 text-purple-600 mx-auto" />
             <p className="text-2xl font-bold text-gray-900 mt-2">{serverStats.uptime}</p>
             <p className="text-xs text-gray-500">Uptime</p>
           </div>
