@@ -1,1 +1,64 @@
-Nothing needs to be added to .gitignore since only a README.md file was modified and no build artifacts, dependencies, or temporary files were detected in the changes.
+```
+# Environment files
+.env
+.env.local
+*.env.*
+
+# Docker related (excluding the added docker files since they appear to be config)
+.dockerenv
+!docker/
+
+# Logs
+*.log
+
+# Dependencies
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.egg-info/
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Editor/IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+build/
+dist/
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.so
+*.o
+*.a
+*.obj
+*.out
+*.exe
+*.dll
+*.so
+
+# Testing and coverage
+.coverage
+coverage/
+htmlcov/
+.nyc_output
+coverage-final.json
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+```

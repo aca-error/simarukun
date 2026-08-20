@@ -1,0 +1,1 @@
+# Place your SSL certificates here:\n# - server.crt\n# - server.key\n# \n# You can generate self-signed certificates for testing:\n# openssl req -x509 -nodes -days 365 -newkey rsa:2048 \\n#   -keyout ssl/server.key -out ssl/server.crt \\n#   -subj "/CN=localhost"\n

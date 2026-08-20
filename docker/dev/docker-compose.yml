@@ -6,8 +6,8 @@ services:
     image: postgres:15-alpine
     container_name: simarukun-db-dev
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-devpassword}
       POSTGRES_DB: simarukun_dev
     ports:
       - "5432:5432"
@@ -49,10 +49,10 @@ services:
       NODE_ENV: development
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-devpassword}
       DB_NAME: simarukun_dev
-      JWT_SECRET: your_very_strong_jwt_secret_here_min_32_chars
+      JWT_SECRET: ${JWT_SECRET:-your_very_strong_jwt_secret_here_min_32_chars}
       JWT_EXPIRES_IN: 15m
       JWT_REFRESH_EXPIRES_IN: 7d
       REDIS_HOST: redis
