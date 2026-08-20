@@ -342,9 +342,7 @@ Anda bisa mencoba login dengan akun demo berikut:
 
 ## 🤝 Kontribusi
 
-Proyek ini dikembangkan oleh **LeChat (AI Assistant)** atas permintaan **Priyo Gunawan**. Saat ini, pengembangan dilakukan secara **mandiri** tanpa tim pengembang manusia.
-
-Jika Anda ingin berkontribusi, silakan:
+Kami sangat terbuka untuk kontribusi dari komunitas! Jika Anda ingin berkontribusi, silakan:
 1. Fork repository ini.
 2. Buat branch baru (`git checkout -b fitur-baru`).
 3. Commit perubahan (`git commit -am 'Menambahkan fitur baru'`).
