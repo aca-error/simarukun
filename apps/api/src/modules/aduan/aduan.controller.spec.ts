@@ -139,7 +139,7 @@ describe('AduanController', () => {
 
       mockAduanService.create.mockResolvedValue(mockAduan);
 
-      const result = await controller.create(createAduanDto, undefined, mockRequest as any);
+      const result = await controller.create(createAduanDto, mockRequest as any, undefined);
 
       expect(result).toEqual(mockAduan);
       expect(mockAduanService.create).toHaveBeenCalledWith(createAduanDto, undefined, mockRequest.user);
@@ -163,7 +163,7 @@ describe('AduanController', () => {
 
       mockAduanService.create.mockResolvedValue(mockAduan);
 
-      const result = await controller.create(createAduanDto, mockFile, mockRequest as any);
+      const result = await controller.create(createAduanDto, mockRequest as any, mockFile);
 
       expect(result.lampiran).toBe('photo.jpg');
       expect(mockAduanService.create).toHaveBeenCalledWith(createAduanDto, mockFile, mockRequest.user);
