@@ -94,3 +94,9 @@ export interface BaseStats {
   total: number;
   [key: string]: number | Record<string, number>;
 }
+
+/**
+ * Authenticated request interface
+ */
+export interface AuthRequest extends Request {
+  user: {\n    id: string;\n    email: string;\n    role: UserRoleType;\n    nama: string;\n  };\n}

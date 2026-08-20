@@ -12,6 +12,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
+import { AuthRequest } from '../../common/types';
 import { IuranService } from './iuran.service';
 import { CreateIuranDto } from './dto/create-iuran.dto';
 import { UpdateIuranDto } from './dto/update-iuran.dto';
@@ -33,7 +34,7 @@ export class IuranController {
    */
   @Get()
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR, UserRole.ADMIN)
-  @Throttle(100, 60000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @ApiOperation({ summary: 'Get all iuran records (Super Admin, Supervisor, Admin)' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
@@ -41,7 +42,7 @@ export class IuranController {
   @ApiQuery({ name: 'tahun', required: false, type: Number })
   @ApiQuery({ name: 'bulan', required: false, type: Number })
   async findAll(
-    @Request() req,
+    @Request() req: AuthRequest,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
     @Query('status') status?: string,
@@ -56,14 +57,14 @@ export class IuranController {
    */
   @Get('report')
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR, UserRole.ADMIN)
-  @Throttle(100, 60000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @ApiOperation({ summary: 'Get iuran report (Super Admin, Supervisor, Admin)' })
   @ApiQuery({ name: 'tahun', required: false, type: Number })
   @ApiQuery({ name: 'bulan', required: false, type: Number })
   async getReport(
     @Query('tahun') tahun?: number,
     @Query('bulan') bulan?: number,
-    @Request() req?,
+    @Request() req?: AuthRequest,
   ) {
     return this.iuranService.getReport(tahun, bulan);
   }
@@ -73,10 +74,10 @@ export class IuranController {
    */
   @Get('user/:userId')
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR, UserRole.ADMIN, UserRole.WARGA)
-  @Throttle(100, 60000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @ApiOperation({ summary: 'Get iuran history for a user' })
   @ApiParam({ name: 'userId', type: String })
-  async findByUser(@Param('userId') userId: string, @Request() req) {
+  async findByUser(@Param('userId') userId: string, @Request() req: AuthRequest) {
     // Warga only allowed to see their own iuran
     if (req.user.role === UserRole.WARGA && req.user.id !== userId) {
       throw new ForbiddenException('Anda hanya dapat melihat iuran sendiri');
@@ -89,10 +90,10 @@ export class IuranController {
    */
   @Get(':id')
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR, UserRole.ADMIN, UserRole.WARGA)
-  @Throttle(100, 60000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @ApiOperation({ summary: 'Get iuran by ID' })
   @ApiParam({ name: 'id', type: String })
-  async findOne(@Param('id') id: string, @Request() req) {
+  async findOne(@Param('id') id: string, @Request() req: AuthRequest) {
     const iuran = await this.iuranService.findOne(id);
     // Warga only allowed to see their own iuran
     if (req.user.role === UserRole.WARGA && iuran.userId !== req.user.id) {
@@ -106,9 +107,9 @@ export class IuranController {
    */
   @Post()
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR, UserRole.ADMIN)
-  @Throttle(100, 60000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @ApiOperation({ summary: 'Create a new iuran record (Super Admin, Supervisor, Admin)' })
-  async create(@Body() createIuranDto: CreateIuranDto, @Request() req) {
+  async create(@Body() createIuranDto: CreateIuranDto, @Request() req: AuthRequest) {
     return this.iuranService.create(createIuranDto, req.user);
   }
 
@@ -117,13 +118,13 @@ export class IuranController {
    */
   @Put(':id')
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR, UserRole.ADMIN)
-  @Throttle(100, 60000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @ApiOperation({ summary: 'Update an iuran record (Super Admin, Supervisor, Admin)' })
   @ApiParam({ name: 'id', type: String })
   async update(
     @Param('id') id: string,
     @Body() updateIuranDto: UpdateIuranDto,
-    @Request() req,
+    @Request() req: AuthRequest,
   ) {
     return this.iuranService.update(id, updateIuranDto, req.user);
   }
@@ -133,10 +134,10 @@ export class IuranController {
    */
   @Delete(':id')
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR)
-  @Throttle(100, 60000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @ApiOperation({ summary: 'Delete an iuran record (Super Admin & Supervisor only)' })
   @ApiParam({ name: 'id', type: String })
-  async remove(@Param('id') id: string, @Request() req) {
+  async remove(@Param('id') id: string, @Request() req: AuthRequest) {
     return this.iuranService.remove(id, req.user);
   }
 }

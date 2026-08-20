@@ -28,6 +28,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../../common/enums/user-role.enum';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery, ApiParam, ApiConsumes } from '@nestjs/swagger';
+import { AuthRequest } from '../../common/types';
 
 @ApiTags('Aduan')
 @Controller('aduan')
@@ -41,14 +42,14 @@ export class AduanController {
    */
   @Get()
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR, UserRole.ADMIN)
-  @Throttle(100, 60000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @ApiOperation({ summary: 'Get all aduan records (Super Admin, Supervisor, Admin)' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'status', required: false, type: String })
   @ApiQuery({ name: 'kategori', required: false, type: String })
   async findAll(
-    @Request() req,
+    @Request() req: AuthRequest,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
     @Query('status') status?: string,
@@ -62,9 +63,9 @@ export class AduanController {
    */
   @Get('stats')
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR, UserRole.ADMIN)
-  @Throttle(100, 60000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @ApiOperation({ summary: 'Get aduan statistics (Super Admin, Supervisor, Admin)' })
-  async getStats(@Request() req) {
+  async getStats(@Request() req: AuthRequest) {
     return this.aduanService.getStats();
   }
 
@@ -73,10 +74,10 @@ export class AduanController {
    */
   @Get('user/:userId')
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR, UserRole.ADMIN, UserRole.WARGA)
-  @Throttle(100, 60000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @ApiOperation({ summary: 'Get aduan by user' })
   @ApiParam({ name: 'userId', type: String })
-  async findByUser(@Param('userId') userId: string, @Request() req) {
+  async findByUser(@Param('userId') userId: string, @Request() req: AuthRequest) {
     // Warga only allowed to see their own aduan
     if (req.user.role === UserRole.WARGA && req.user.id !== userId) {
       throw new ForbiddenException('Anda hanya dapat melihat aduan sendiri');
@@ -89,10 +90,10 @@ export class AduanController {
    */
   @Get(':id')
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR, UserRole.ADMIN, UserRole.WARGA)
-  @Throttle(100, 60000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @ApiOperation({ summary: 'Get aduan by ID' })
   @ApiParam({ name: 'id', type: String })
-  async findOne(@Param('id') id: string, @Request() req) {
+  async findOne(@Param('id') id: string, @Request() req: AuthRequest) {
     const aduan = await this.aduanService.findOne(id);
     // Warga only allowed to see their own aduan
     if (req.user.role === UserRole.WARGA && aduan.userId !== req.user.id) {
@@ -106,7 +107,7 @@ export class AduanController {
    */
   @Post()
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR, UserRole.ADMIN, UserRole.WARGA)
-  @Throttle(100, 60000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @ApiOperation({ summary: 'Create a new aduan' })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(
@@ -131,7 +132,7 @@ export class AduanController {
   )
   async create(
     @Body() createAduanDto: CreateAduanDto,
-    @Request() req,
+    @Request() req: AuthRequest,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     return this.aduanService.create(createAduanDto, file, req.user);
@@ -142,13 +143,13 @@ export class AduanController {
    */
   @Put(':id/status')
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR, UserRole.ADMIN)
-  @Throttle(100, 60000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @ApiOperation({ summary: 'Update aduan status (Super Admin, Supervisor, Admin)' })
   @ApiParam({ name: 'id', type: String })
   async updateStatus(
     @Param('id') id: string,
     @Body('status') status: string,
-    @Request() req,
+    @Request() req: AuthRequest,
   ) {
     return this.aduanService.updateStatus(id, status, req.user);
   }
@@ -158,13 +159,13 @@ export class AduanController {
    */
   @Put(':id')
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR, UserRole.ADMIN)
-  @Throttle(100, 60000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @ApiOperation({ summary: 'Update an aduan (Super Admin, Supervisor, Admin)' })
   @ApiParam({ name: 'id', type: String })
   async update(
     @Param('id') id: string,
     @Body() updateAduanDto: UpdateAduanDto,
-    @Request() req,
+    @Request() req: AuthRequest,
   ) {
     return this.aduanService.update(id, updateAduanDto, req.user);
   }
@@ -174,10 +175,10 @@ export class AduanController {
    */
   @Delete(':id')
   @Roles(UserRole.SUPERADMIN, UserRole.SUPERVISOR)
-  @Throttle(100, 60000)
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @ApiOperation({ summary: 'Delete an aduan (Super Admin & Supervisor only)' })
   @ApiParam({ name: 'id', type: String })
-  async remove(@Param('id') id: string, @Request() req) {
+  async remove(@Param('id') id: string, @Request() req: AuthRequest) {
     return this.aduanService.remove(id, req.user);
   }
 }
