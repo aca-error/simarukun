@@ -11,7 +11,11 @@ async function bootstrap() {
       dsn: process.env.SENTRY_DSN,
       tracesSampleRate: 1.0,
       environment: process.env.NODE_ENV || 'development',
-      release: process.env.RELEASE_VERSION || '1.0.0',
+      release: process.env.RELEASE_VERSION || '1.2.0',
+      integrations: [
+        Sentry.httpIntegration(),
+        Sentry.expressIntegration(),
+      ],
     });
   }
 

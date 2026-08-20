@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { useAuthStore } from '@/stores/authStore';
-import { loginApi } from '@/lib/api';
+import { useAuthStore } from '@/store/authStore';
+import { authApi } from '@/lib/api';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -27,21 +27,15 @@ export default function Login() {
     setIsLoading(true);
     
     try {
-      const response = await loginApi({ email, password });
+      const response = await authApi.login({ email, password });
       
-      // Store tokens
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('access_token', response.accessToken);
-        localStorage.setItem('refresh_token', response.refreshToken);
-      }
-      
-      // Update Zustand store
-      login(response.user);
+      // Update Zustand store with token and user
+      login(response.access_token, response.user);
       
       router.push('/');
     } catch (err: any) {
       setError(
-        err.response?.data?.message || 
+        err.message || 
         'Email atau password salah. Pastikan backend API berjalan.'
       );
     } finally {
