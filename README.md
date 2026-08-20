@@ -1,15 +1,15 @@
 # SimaRukun - Sistem Manajemen RT/RW
 
 [![Status](https://img.shields.io/badge/status-testing-yellow)](https://github.com/aca-error/simarukun)
-[![Progress](https://img.shields.io/badge/progress-15%25-orange)](https://github.com/aca-error/simarukun)
+[![Progress](https://img.shields.io/badge/progress-46%25-orange)](https://github.com/aca-error/simarukun)
 [![Enterprise Compliance](https://img.shields.io/badge/compliance-85%25-blue)](https://github.com/aca-error/simarukun)
-[![Last Update](https://img.shields.io/badge/last%20update-20%20Juni%202026-green)](https://github.com/aca-error/simarukun)
+[![Last Update](https://img.shields.io/badge/last%20update-25%20Juni%202026-green)](https://github.com/aca-error/simarukun)
 
 ## 📌 Deskripsi Proyek
 
 **SimaRukun** (Sistem Manajemen Rukun Warga & Rukun Tetangga) adalah aplikasi berbasis web responsif yang dirancang untuk **memodernisasi dan mendigitalkan pengelolaan administrasi, komunikasi, dan keuangan** di tingkat RT dan RW. Aplikasi ini menjembatani kesenjangan komunikasi antara pengurus (Ketua RT/RW, Bendahara) dan warga, memastikan **transparansi iuran bulanan**, serta menyediakan saluran resmi untuk **pelaporan dan aduan**. 
 
-Aplikasi ini dibangun dengan **Next.js 14 (React)**, **Tailwind CSS**, dan **TypeScript** untuk frontend, serta **NestJS 10** untuk backend dalam arsitektur monorepo.
+Aplikasi ini dibangun dengan **Next.js 14 (React)**, **Tailwind CSS**, dan **TypeScript** untuk frontend, serta **NestJS 11** untuk backend dalam arsitektur monorepo.
 
 ---
 
@@ -85,7 +85,8 @@ Aplikasi SimaRukun mendukung **4 role** yang berbeda, sesuai dengan PRD:
 - **Total Files**: 83+
 - **Total Commits**: 50+
 - **Test Coverage**: ~92% (Unit Tests Backend)
-- **Last Update**: 20 Juni 2026
+- **Task Completion**: 46% (30/65 tasks)
+- **Last Update**: 25 Juni 2026
 
 ---
 
@@ -182,16 +183,18 @@ simarukun/
 
 | **Teknologi** | **Versi** | **Kegunaan** |
 |---------------|-----------|--------------|
-| NestJS | 10.3.0 | Web framework |
-| TypeORM | 0.3.19 | ORM |
+| NestJS | 11.0.0 | Web framework |
+| TypeORM | 0.3.20 | ORM |
 | PostgreSQL | 15+ | Database |
 | Passport | 0.7.0 | Authentication |
 | JWT | 10.2.0 | Token-based auth |
-| Helmet | 7.1.0 | Security headers |
-| csurf | 1.11.0 | CSRF protection |
+| Helmet | 8.0.0 | Security headers |
 | NestJS Throttler | 4.0.0 | Rate limiting |
-| Zod | 3.22.4 | Input validation |
-| Argon2 | 1.7.0 | Password hashing |
+| Zod | 3.24.0 | Input validation |
+| Argon2 (@node-rs/argon2) | 2.0.0 | Password hashing |
+| Winston | 3.14.0 | Logging |
+| Sentry | 8.0.0 | Error tracking |
+| Prometheus | Latest | Metrics |
 
 ### **DevOps & Infrastruktur**
 
@@ -375,7 +378,13 @@ Untuk informasi lebih lanjut, lihat dokumentasi berikut:
 | [USER.md](USER.md) | Panduan pengguna untuk semua role |
 | [CHANGELOG.md](CHANGELOG.md) | Catatan perubahan dan release |
 | [INSTRUCTIONS.md](INSTRUCTIONS.md) | Instruksi teknis pengembangan |
+| [TASK.md](TASK.md) | Task tracker dengan status 65 tasks |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Rencana pengembangan jangka panjang |
+| [docs/AUDIT.md](docs/AUDIT.md) | Audit report kode per 25 Juni 2026 |
+| [docs/REPORT_PHASE_1.md](docs/REPORT_PHASE_1.md) | Laporan Phase 1 Security Hardening |
+| [DEPENDENCY_UPDATE.md](DEPENDENCY_UPDATE.md) | Detail update dependensi |
+| [UPDATE_SUMMARY.md](UPDATE_SUMMARY.md) | Ringkasan update dependencies |
+| [DEVELOPMENT_PROGRESS.md](DEVELOPMENT_PROGRESS.md) | Laporan progress pengembangan |
 
 ### **Dokumentasi Teknis (Coming Soon)**
 - `API.md` - Dokumentasi API endpoints
@@ -389,8 +398,12 @@ Untuk informasi lebih lanjut, lihat dokumentasi berikut:
 
 ---
 
+
 ## 📝 Catatan Revisi Terbaru
+- **Refactoring Code**: Membuat shared types, base service/controller, error handling terpusat, response interceptor, dan guards (25 Juni 2026)
+- **Update Dependencies**: NestJS 10→11, Sentry 7→8, Helmet 7→8, dan 50+ packages lainnya (25 Juni 2026)
+- **Security Hardening**: 14 tasks P1 selesai termasuk privilege escalation fix, password hashing, IDOR prevention (25 Juni 2026)
 - **Laporan**: Sekarang dapat diakses oleh **Super Admin, Supervisor, dan Admin** (sebelumnya hanya Super Admin & Supervisor).
 - **Backup**: Sekarang dapat diakses oleh **Super Admin dan Supervisor** (sebelumnya hanya Super Admin).
-- **Tech Stack**: Diperbarui mencerminkan arsitektur monorepo dengan NestJS backend dan Zustand state management.
+- **Tech Stack**: Diperbarui mencerminkan arsitektur monorepo dengan NestJS 11 backend dan Zustand state management.
 - **Struktur Proyek**: Ditambahkan struktur lengkap monorepo dengan apps/web dan apps/api.

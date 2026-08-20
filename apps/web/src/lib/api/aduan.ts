@@ -1,61 +1,76 @@
 import apiClient from '../api-client';
-
-export interface Aduan {
-  id: string;
-  warga_id: string;
-  judul: string;
-  isi: string;
-  kategori: 'infrastruktur' | 'keamanan' | 'kebersihan' | 'lainnya';
-  status: 'pending' | 'proses' | 'selesai' | 'ditolak';
-  prioritas: 'rendah' | 'sedang' | 'tinggi';
-  lokasi?: string;
-  foto_url?: string;
-  respon?: string;
-  created_at: string;
-  updated_at: string;
-  warga?: {
-    name: string;
-  };
-}
-
-export interface CreateAduanPayload {
-  judul: string;
-  isi: string;
-  kategori: 'infrastruktur' | 'keamanan' | 'kebersihan' | 'lainnya';
-  prioritas: 'rendah' | 'sedang' | 'tinggi';
-  lokasi?: string;
-  foto?: File;
-}
-
-export interface UpdateAduanPayload {
-  status?: 'pending' | 'proses' | 'selesai' | 'ditolak';
-  respon?: string;
-  prioritas?: 'rendah' | 'sedang' | 'tinggi';
-}
+import { Aduan, CreateAduanDto, UpdateAduanDto, AduanPaginationResult } from '@/types/api/aduan';
 
 export const aduanApi = {
-  getAll: async (params?: { status?: string }): Promise<Aduan[]> => {
+  /**
+   * Get all aduan with pagination and filters
+   */
+  getAll: async (params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    kategori?: string;
+  }): Promise<AduanPaginationResult> => {
     const response = await apiClient.get('/aduan', { params });
     return response.data;
   },
 
+  /**
+   * Get aduan statistics
+   */
+  getStats: async (): Promise<{ data: any }> => {
+    const response = await apiClient.get('/aduan/stats');
+    return response.data;
+  },
+
+  /**
+   * Get aduan by ID
+   */
   getById: async (id: string): Promise<Aduan> => {
     const response = await apiClient.get(`/aduan/${id}`);
     return response.data;
   },
 
-  create: async (payload: FormData): Promise<Aduan> => {
-    const response = await apiClient.post('/aduan', payload, {
+  /**
+   * Get aduan by user ID
+   */
+  getByUser: async (userId: string): Promise<Aduan[]> => {
+    const response = await apiClient.get(`/aduan/user/${userId}`);
+    return response.data;
+  },
+
+  /**
+   * Create a new aduan (with file upload)
+   */
+  create: async (formData: FormData): Promise<Aduan> => {
+    const response = await apiClient.post('/aduan', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
   },
 
-  update: async (id: string, payload: UpdateAduanPayload): Promise<Aduan> => {
-    const response = await apiClient.patch(`/aduan/${id}`, payload);
+  /**
+   * Update aduan status (admin only)
+   */
+  updateStatus: async (
+    id: string,
+    status: string,
+  ): Promise<Aduan> => {
+    const response = await apiClient.put(`/aduan/${id}/status`, { status });
     return response.data;
   },
 
+  /**
+   * Update an aduan
+   */
+  update: async (id: string, payload: UpdateAduanDto): Promise<Aduan> => {
+    const response = await apiClient.put(`/aduan/${id}`, payload);
+    return response.data;
+  },
+
+  /**
+   * Delete an aduan
+   */
   delete: async (id: string): Promise<void> => {
     await apiClient.delete(`/aduan/${id}`);
   },

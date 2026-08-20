@@ -10,16 +10,9 @@ import { CreateAduanDto } from './dto/create-aduan.dto';
 import { UpdateAduanDto } from './dto/update-aduan.dto';
 import { User } from '../users/entities/user.entity';
 import { UserRole } from '../../common/enums/user-role.enum';
+import { PaginatedResult, BaseStats } from '../../common/types';
 
-export interface PaginatedResult<T> {
-  data: T[];
-  total: number;
-  page: number;
-  limit: number;
-}
-
-export interface AduanStats {
-  total: number;
+export interface AduanStats extends BaseStats {
   baru: number;
   diproses: number;
   selesai: number;
